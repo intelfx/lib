@@ -30,3 +30,15 @@ regex_chk() {
 		return 1
 	fi
 }
+
+join() {
+	local sep="$1" arg0="$2"
+	shift 2
+	echo "$ret${@/#/$sep}"
+}
+
+split_into() {
+	declare -n out="$1"
+	local IFS="$2" in="$3"
+	read -ra out <<< "$in"
+}
