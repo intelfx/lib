@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import logging
 import yaml
+import fcntl
 
 # TODO: mutable container modifications are honored (attr-converted) only for dict itself
 # i. e. `an_attrdict['newindex'] = { 'some': 'dict' }` will work, but
@@ -148,6 +149,12 @@ def configure_logging(*, prefix=None, handler=None, **kwargs):
 		format=fmt,
 		**kwargs,
 	)
+
+
+def file_lock(path, mode):
+	f = open(path, mode)
+	fcntl.lockf(f.fileno(), fcntl.LOCK_EX)
+	return f
 
 
 def file_get(path):
