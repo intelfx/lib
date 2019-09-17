@@ -164,4 +164,6 @@ def file_get(path):
 
 def file_put(path, text):
 	with open(path, 'w') as f:
-		return f.write(text)
+		r = f.write(text)
+		f.flush()
+		os.fsync(f.fileno())
