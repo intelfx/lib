@@ -34,7 +34,7 @@ regex_chk() {
 join() {
 	local sep="$1" arg0="$2"
 	shift 2
-	echo "$ret${@/#/$sep}"
+	echo "$arg0${@/#/$sep}"
 }
 
 split_into() {
