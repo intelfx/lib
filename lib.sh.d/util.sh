@@ -42,3 +42,18 @@ split_into() {
 	local IFS="$2" in="$3"
 	read -ra out <<< "$in"
 }
+
+inplace() {
+	eval "$(ltraps)"
+	_inplace_cleanup() {
+		if [[ -e $out ]]; then
+			rm -f "$out"
+		fi
+	}
+	ltrap _inplace_cleanup
+	local in="$1" out="$(mktemp)"
+	shift 1
+
+	"$@" <"$in" >"$out"
+	cat "$out" >"$in"
+}
