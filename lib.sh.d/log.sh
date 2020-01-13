@@ -1,21 +1,30 @@
 #!/bin/bash
 
+function _libsh_log() {
+	local marker="$1" prefix="$2" text="$3"
+	echo "${marker:+$marker }${prefix:+$prefix: }$text" >&2
+}
+
 function dbg() {
 	if (( LIBSH_DEBUG )); then
-		echo "DBG: $*" >&2
+		_libsh_log "DBG:" "$LIBSH_LOG_PREFIX" "$*"
 	fi
 }
 
 function log() {
-	echo ":: $*" >&2
+	_libsh_log "::" "$LIBSH_LOG_PREFIX" "$*"
+}
+
+function say() {
+	_libsh_log "" "" "$*"
 }
 
 function warn() {
-	echo "W: $*" >&2
+	_libsh_log "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
 
 function err() {
-	echo "E: $*" >&2
+	_libsh_log "E:" "$LIBSH_LOG_PREFIX" "$*"
 }
 
 function die() {
