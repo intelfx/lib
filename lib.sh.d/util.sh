@@ -75,3 +75,25 @@ sort_array() {
 
 	readarray -t -d '' "$name" < <(printf '%s\0' "${array[@]}" | sort -z "$@")
 }
+
+makeset() {
+	local name="$1"
+	local value="$2"
+	declare -n map="$name"
+	shift 2
+
+	local key
+	for key in "$@"; do
+		map["$key"]="$value"
+	done
+}
+
+readset() {
+	local args=( "${@:1:$#-2}" )
+	local name="${@:($#-1):1}"
+	local value="${@:($#):1}"
+
+	declare -a array
+	readarray "${args[@]}" array
+	make_map "$name" "$value" "${array[@]}"
+}
