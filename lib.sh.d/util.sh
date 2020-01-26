@@ -57,3 +57,21 @@ inplace() {
 	"$@" <"$in" >"$out"
 	cat "$out" >"$in"
 }
+
+print_array() {
+	if (( $# )); then
+		printf "%s\n" "$@"
+	fi
+}
+
+sort_array() {
+	local name="$1"
+	declare -n array="$name"
+	shift 1
+
+	if ! (( "${#array[@]}" )); then
+		return
+	fi
+
+	readarray -t -d '' "$name" < <(printf '%s\0' "${array[@]}" | sort -z "$@")
+}
