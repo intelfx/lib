@@ -2,7 +2,7 @@
 
 set -e
 
-__libsh="${BASH_SOURCE}.d"
+__libsh="$(realpath -qe "${BASH_SOURCE}").d"
 if ! [[ -d "$__libsh" ]]; then
 	echo "lib.sh: $__libsh does not exist!"
 	return 1
