@@ -12,6 +12,13 @@ ltraps() {
 	EOF
 }
 
+globaltraps() {
+	cat <<-"EOF"
+	declare -a __traps;
+	trap '__rc=$?; __t=""; for __t in "${__traps[@]}"; do eval "$__t"; done; trap - EXIT; exit "$__rc";' EXIT
+	EOF
+}
+
 ltrap() {
 	__traps+=("$1")
 }
