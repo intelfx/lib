@@ -51,8 +51,9 @@ inplace() {
 		fi
 	}
 	ltrap _inplace_cleanup
-	local in="$1" out="$(mktemp)"
-	shift 1
+	local in="${@: -1}"
+	local out="$(mktemp)"
+	set -- "${@:0:$#}"
 
 	"$@" <"$in" >"$out"
 	cat "$out" >"$in"
