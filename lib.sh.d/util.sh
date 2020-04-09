@@ -43,6 +43,15 @@ split_into() {
 	read -ra out <<< "$in"
 }
 
+# dirname
+dn() {
+	if [[ $1 == */* ]]; then
+		echo "${1%/*}"
+	else
+		echo .
+	fi
+}
+
 inplace() {
 	eval "$(ltraps)"
 	_inplace_cleanup() {
@@ -57,6 +66,22 @@ inplace() {
 
 	"$@" <"$in" >"$out"
 	cat "$out" >"$in"
+}
+
+inplace_rename() {
+	eval "$(ltraps)"
+	_inplace_cleanup() {
+		if [[ -e $out ]]; then
+			rm -f "$out"
+		fi
+	}
+	ltrap _inplace_cleanup
+	local in="${@: -1}"
+	local out="$(mktemp -p "$(dn "$in")" "${in##*/}.XXXXXXXXXX")"
+	set -- "${@:0:$#}"
+
+	"$@" <"$in" >"$out"
+	mv "$out" "$in"
 }
 
 print_array() {
