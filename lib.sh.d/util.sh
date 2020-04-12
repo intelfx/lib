@@ -62,7 +62,7 @@ inplace() {
 	ltrap _inplace_cleanup
 	local in="${@: -1}"
 	local out="$(mktemp)"
-	set -- "${@:0:$#}"
+	set -- "${@:1:$#}"
 
 	"$@" <"$in" >"$out"
 	cat "$out" >"$in"
