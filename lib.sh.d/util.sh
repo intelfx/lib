@@ -45,11 +45,12 @@ split_into() {
 
 # dirname
 dn() {
-	if [[ $1 == */* ]]; then
-		echo "${1%/*}"
-	else
-		echo .
-	fi
+	local dirname="${1%/*}"
+	case "$dirname" in
+	"$1") echo . ;;  # $1 contains no slashes
+	"")   echo / ;;  # $1 contains a single slash in the starting position
+	*)    echo "$dirname" ;;
+	esac
 }
 
 inplace() {
