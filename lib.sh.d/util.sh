@@ -53,6 +53,10 @@ dn() {
 	esac
 }
 
+scriptdir() {
+	echo "$(dn "$(realpath -qe "${BASH_SOURCE[1]}")")"
+}
+
 inplace() {
 	eval "$(ltraps)"
 	_inplace_cleanup() {
