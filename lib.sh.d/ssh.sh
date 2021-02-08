@@ -31,6 +31,7 @@ function ssh_prep() {
 	ssh_args=(
 		# FIXME: drop -4
 		-4
+		-o BatchMode=yes
 		-o StrictHostKeyChecking=accept-new
 	)
 	if [[ "$identity" ]]; then
