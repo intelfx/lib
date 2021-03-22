@@ -1,6 +1,7 @@
 #!/bin/bash
 
-set -e
+set -eo pipefail
+shopt -s lastpipe
 
 __libsh="$(realpath -qe "${BASH_SOURCE}").d"
 if ! [[ -d "$__libsh" ]]; then
