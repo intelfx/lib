@@ -42,3 +42,9 @@ ltrap() {
 luntrap() {
 	unset __traps[-1]
 }
+
+lruntrap() {
+	local __t="${__traps[-1]}"
+	unset __traps=[-1]
+	eval "$__t"
+}
