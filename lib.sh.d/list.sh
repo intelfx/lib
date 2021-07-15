@@ -146,3 +146,38 @@ list_sub() {
 
 	_list_collapse_A result
 }
+
+list_into_mask() {
+	declare -a in
+	_list_explode_a in "$1"
+	local out="0"
+
+	local k
+	for k in "${in[@]}"; do
+		out="$(( out | 1<<k ))"
+	done
+
+	if (( "${2:-0}" )); then
+		local width_bit="$2"
+		local width_hex="$(( (width_bit + 3) / 4 ))"
+		printf "%0*x\n" "$width_hex" "$out"
+	else
+		printf '%x\n' "$out"
+	fi
+}
+
+list_from_mask() {
+	local in="$(( 0x"${1:-0}" ))"
+	declare -a out
+
+	local k=0
+	while (( in )); do
+		if (( in & 1 )); then
+			out+=( "$k" )
+		fi
+		in="$(( in >> 1 ))"
+		(( ++k ))
+	done
+
+	_list_collapse_a out
+}
