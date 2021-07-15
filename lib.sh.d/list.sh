@@ -42,16 +42,9 @@ __list_collapse_one() {
 	fi
 }
 
-_list_collapse_A() {
-	declare -n in_hash="$1"
-	declare -a in_array out_array
-
-	# printf '%s\n' breaks for empty arrays
-	if ! (( ${#in_hash[@]} )); then
-		return
-	fi
-
-	printf '%s\n' "${!in_hash[@]}" | sort -n | readarray -t in_array
+_list_collapse_a() {
+	declare -n in_array="$1"
+	declare -a out_array
 
 	local i first last
 
@@ -72,6 +65,25 @@ _list_collapse_A() {
 	IFS=,
 	echo "${out_array[*]}"
 	unset IFS
+}
+
+_list_A_to_a() {
+	declare -n in_hash="$1"
+	declare -n out_array="$2"
+
+	# printf '%s\n' breaks for empty arrays
+	if ! (( ${#in_hash[@]} )); then
+		return
+	fi
+
+	printf '%s\n' "${!in_hash[@]}" | sort -n | readarray -t out_array
+}
+
+_list_collapse_A() {
+	declare -a array
+
+	_list_A_to_a "$1" array
+	_list_collapse_a array
 }
 
 list_or() {
