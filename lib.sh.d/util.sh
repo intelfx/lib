@@ -128,3 +128,10 @@ readset() {
 	readarray "${args[@]}" array
 	make_map "$name" "$value" "${array[@]}"
 }
+
+var_copy() {
+	local src="$1" dest="$2"
+	local p="$(declare -p "$src")"
+	p="${p/ $src/ $dest}"
+	echo "$p"
+}
