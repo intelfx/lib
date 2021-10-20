@@ -177,3 +177,20 @@ list_from_mask() {
 
 	_list_collapse_a out
 }
+
+list_into_array() {
+	_list_explode_a "$1" "$2"
+}
+
+list_max() {
+	declare -a in
+	_list_explode_a in "$1"
+	local out="${in[0]}"
+
+	local k
+	for k in "${in[@]:1}"; do
+		(( out = in>out ? in : out )) || true
+	done
+
+	echo "$out"
+}
