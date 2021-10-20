@@ -87,21 +87,17 @@ _list_collapse_A() {
 }
 
 list_or() {
-	declare -a lhs rhs
 	declare -A result
+	declare -a op
 
-	_list_explode_a lhs "$1"
-	_list_explode_a rhs "$2"
+	local arg k
+	for arg; do
+		_list_explode_a op "$arg"
+		for k in "${op[@]}"; do
+			result[$k]=1
+		done
 
-	declare -p lhs
-	declare -p rhs
-
-	local k
-	for k in "${lhs[@]}" "${rhs[@]}"; do
-		result[$k]=1
 	done
-
-	declare -p result
 
 	_list_collapse_A result
 }
