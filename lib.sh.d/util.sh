@@ -135,3 +135,13 @@ var_copy() {
 	p="${p/ $src/ $dest}"
 	echo "$p"
 }
+
+all_parents() {
+	local d
+	for d; do
+		while [[ $d && $d != '.' && $d != '/' ]]; do
+			echo "$d"
+			d="${d%/*}"
+		done
+	done
+}
