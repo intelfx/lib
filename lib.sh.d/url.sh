@@ -22,3 +22,7 @@ urldecode() {
     local url_encoded="${1//+/ }"
     printf '%b' "${url_encoded//%/\\x}"
 }
+
+#
+# ref. https://stackoverflow.com/a/10660730/857932
+#
