@@ -25,7 +25,9 @@ parse_args() {
 	for key in "${!spec[@]}"; do
 		value="${spec[$key]}"
 
-		if [[ $key =~ ^(--|-)([a-zA-Z0-9_-]+)(|:|::)$ ]]; then
+		if [[ $key == -- ]]; then
+			arg_to_target[$key]="$value"
+		elif [[ $key =~ ^(--|-)([a-zA-Z0-9_-]+)(|:|::)$ ]]; then
 			key_dashes="${BASH_REMATCH[1]}"
 			key_name="${BASH_REMATCH[2]}"
 			key_valspec="${BASH_REMATCH[3]}"
@@ -40,8 +42,6 @@ parse_args() {
 
 			arg_to_target[$key_dashes$key_name]="$value"
 			arg_to_valspec[$key_dashes$key_name]="$key_valspec"
-		elif [[ $key == -- ]]; then
-			arg_to_target[$key]="$value"
 		else
 			err "parse_args: bad key: [$key]=$value"
 			return 1
