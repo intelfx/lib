@@ -145,3 +145,14 @@ all_parents() {
 		done
 	done
 }
+
+max() {
+	if ! (( $# )); then return; fi
+	local max="$1" arg
+	shift
+	for arg; do
+		(( max = arg>max ? arg : max )) || true
+	done
+
+	echo "$max"
+}
