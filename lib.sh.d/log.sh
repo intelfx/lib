@@ -31,3 +31,17 @@ function die() {
 	err "$@"
 	exit 1
 }
+
+function assert() {
+	local stmt="$1"
+	if ! eval "$stmt"; then
+		die "assertion failed: $stmt ($(eval "echo $stmt"))"
+	fi
+}
+
+function assert_e() {
+	local expr="$1"
+	if ! eval "[[ $expr ]]"; then
+		die "assertion failed: $expr ($(eval "echo $expr"))"
+	fi
+}
