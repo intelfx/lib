@@ -156,3 +156,29 @@ max() {
 
 	echo "$max"
 }
+
+maybe_find() {
+	local has_paths=0
+
+	#
+	# very simple partial argument parser for find(1), utilizing the fact
+	# that only a few options to `find` may appear before paths
+	#
+
+	local skip=0
+	for arg; do
+		if (( skip )); then (( skip-- )); continue; fi
+		case "$arg" in
+		-H|-L|-P|-O?*|-D?*)  # -O, -D with arg (-O1, -Dfoobar)
+			continue ;;
+		-O|-D)  # -O, -D with next arg (-O 1, -D foobar)
+			skip=1; continue ;;
+		-*)
+			break ;;
+		*)
+			has_paths=1 ;;
+		esac
+	done
+	if ! (( has_paths )); then return; fi
+	find "$@"
+}
