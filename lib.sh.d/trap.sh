@@ -24,7 +24,7 @@
 ltraps() {
 	cat <<-"EOF"
 	declare -a __traps;
-	trap 'local __rc=$?; local __t; for __t in "${__traps[@]}"; do eval "$__t"; done; trap - RETURN; return "$__rc";' RETURN
+	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t"; done; trap - RETURN' RETURN
 	EOF
 }
 
