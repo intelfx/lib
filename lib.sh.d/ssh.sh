@@ -2,6 +2,7 @@
 
 # in: $host: [user@]host[:port]
 # in: $identity: path to ssh private key
+# in: $@: additional ssh arguments
 # out: ssh_args=(): internal
 # out: do_ssh(): ssh to $host using $identity
 # out: do_sftp(): sftp to $host using $identity
@@ -34,6 +35,7 @@ function ssh_prep() {
 		-o BatchMode=yes
 		-o UserKnownHostsFile=/dev/null
 		-o StrictHostKeyChecking=no
+		"$@"
 	)
 	if [[ "$identity" ]]; then
 		ssh_args+=(
