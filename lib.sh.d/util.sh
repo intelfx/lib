@@ -182,3 +182,97 @@ maybe_find() {
 	if ! (( has_paths )); then return; fi
 	find "$@"
 }
+
+findctl_init() {
+	declare -n find_args="$1_ARGS"; declare -g -a find_args
+	declare -n find_targets="$1_TARGETS"; declare -g -a find_targets
+	declare -n find_pre_args="$1_PRE_ARGS"; declare -g -a find_pre_args
+	declare -n find_exclusions="$1_EXCLUSIONS"; declare -g -a find_exclusions
+	declare -n find_inclusions="$1_INCLUSIONS"; declare -g -a find_inclusions
+	shift
+
+	find_args=( find "$@" )
+	find_targets=()
+	find_pre_args=()
+	find_exclusions=()
+	find_inclusions=()
+}
+
+findctl_add_targets() {
+	declare -n find_targets="$1_TARGETS"; declare -g -a find_targets
+	shift
+
+	find_targets+=( "$@" )
+}
+
+findctl_add_pre_args() {
+	declare -n find_pre_args="$1_PRE_ARGS"; declare -g -a find_pre_args
+	shift
+
+	find_pre_args+=( "$@" )
+}
+
+findctl_add_exclusions() {
+	declare -n find_exclusions="$1_EXCLUSIONS"; declare -g -a find_exclusions
+	shift
+
+	find_exclusions+=( "$@" )
+}
+
+findctl_add_inclusions() {
+	declare -n find_inclusions="$1_INCLUSIONS"; declare -g -a find_inclusions
+	shift
+
+	find_inclusions+=( "$@" )
+}
+
+findctl_run() {
+	declare -n find_args="$1_ARGS"; declare -g -a find_args
+	declare -n find_targets="$1_TARGETS"; declare -g -a find_targets
+	declare -n find_pre_args="$1_PRE_ARGS"; declare -g -a find_pre_args
+	declare -n find_exclusions="$1_EXCLUSIONS"; declare -g -a find_exclusions
+	declare -n find_inclusions="$1_INCLUSIONS"; declare -g -a find_inclusions
+	local name="$1"
+	shift
+
+	if ! (( ${#find_targets[@]} )); then
+		return
+	fi
+
+	declare -a find_cmd
+	find_cmd=( "${find_args[@]}" "${find_targets[@]}" "${find_pre_args[@]}" )
+
+	local e i
+	local i_cmd=()
+	for e in "${find_exclusions[@]}"; do
+		i_cmd=()
+		for i in "${find_inclusions[@]}"; do
+			if [[ "$e" == "$i" ]]; then
+				err "findctl: bad hierarchy: $(realpath "$e") is both included and excluded"
+				return 1
+			fi
+			if [[ "$i" == "$e"/* ]]; then
+				i_cmd+=(
+					-and -not -path "$i/*"
+				)
+			fi
+		done
+
+		if (( ${#i_cmd[@]} > 0 )); then
+			find_cmd+=(
+				-path "$e/*"
+				"${i_cmd[@]}"
+			)
+		else
+			find_cmd+=(
+				-path "$e" -prune
+			)
+		fi
+		find_cmd+=( -or )
+
+	done
+
+	find_cmd+=( "$@" )
+
+	"${find_cmd[@]}"
+}
