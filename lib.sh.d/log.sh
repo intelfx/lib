@@ -32,6 +32,11 @@ function die() {
 	exit 1
 }
 
+function trace() {
+	_libsh_log "->" "$LIBSH_LOG_PREFIX" "$*"
+	"$@"
+}
+
 function assert() {
 	local stmt="$1"
 	if ! eval "$stmt"; then
