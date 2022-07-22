@@ -6,7 +6,7 @@ BASH_BUILTINS_LOADABLE=(
 
 function bash_enable_builtin() {
 	local loadablesdir
-	if ! loadablesdir="$(pkg-config --variable=loadablesdir bash)"; then
+	if ! whence pkg-config &>/dev/null || ! loadablesdir="$(pkg-config --variable=loadablesdir bash)"; then
 		# TODO: fallback
 		return 1
 	fi
