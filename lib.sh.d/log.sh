@@ -45,3 +45,12 @@ function assert_e() {
 		die "assertion failed: $expr ($(eval "echo $expr"))"
 	fi
 }
+
+function usage() {
+	if (( $# )); then
+		err "$@"
+		echo >&2
+	fi
+	_usage >&2
+	exit 1
+}
