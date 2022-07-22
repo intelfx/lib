@@ -126,7 +126,7 @@ readset() {
 
 	declare -a array
 	readarray "${args[@]}" array
-	make_map "$name" "$value" "${array[@]}"
+	makeset "$name" "$value" "${array[@]}"
 }
 
 var_copy() {
