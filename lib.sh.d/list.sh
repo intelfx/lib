@@ -194,3 +194,9 @@ list_max() {
 
 	echo "$out"
 }
+
+list_count() {
+	declare -a in
+	_list_explode_a in "$1"
+	echo "${#in[@]}"
+}
