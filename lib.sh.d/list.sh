@@ -189,7 +189,7 @@ list_max() {
 
 	local k
 	for k in "${in[@]:1}"; do
-		(( out = in>out ? in : out )) || true
+		if (( k > out )); then out="$k"; fi
 	done
 
 	echo "$out"
