@@ -31,6 +31,12 @@ regex_chk() {
 	fi
 }
 
+join1() {
+	local IFS="$1"
+	shift 1
+	echo "$*"
+}
+
 join() {
 	local sep="$1" arg0="$2"
 	shift 2
