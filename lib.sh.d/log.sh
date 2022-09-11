@@ -59,3 +59,24 @@ function usage() {
 	_usage >&2
 	exit 1
 }
+
+function loud() {
+	local args=( "$@" )
+	local len=0
+	local a
+	for a in "${args[@]}"; do
+		if (( "${#a}" > len )); then
+			len="${#a}"
+		fi
+	done
+
+	local header="$(repeat '=' "$(( 5 + len + 5 ))")"
+	echo "$header" >&2
+	for a in "${args[@]}"; do
+		local pad_l="$(repeat ' ' "$(( (len - ${#a}    ) / 2 ))")"  # rounded down
+		local pad_r="$(repeat ' ' "$(( (len - ${#a} + 1) / 2 ))")"  # rounded up
+		echo "==== ${pad_l}${a}${pad_r} ====" >&2
+	done
+	echo "$header" >&2
+}
+
