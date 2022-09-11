@@ -163,6 +163,17 @@ max() {
 	echo "$max"
 }
 
+repeat() {
+	local in="$1" rep="$2"
+	if (( rep > 0 )); then
+		local out="$(printf "%*s" "$rep")"
+		if [[ "$in" != " " ]]; then
+			out="${out// /$in}"
+		fi
+		echo "$out"
+	fi
+}
+
 maybe_find() {
 	local has_paths=0
 
