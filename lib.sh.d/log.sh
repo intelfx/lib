@@ -23,6 +23,10 @@ function warn() {
 	_libsh_log "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
 
+function warning() {
+	warn "$@"
+}
+
 function err() {
 	_libsh_log "E:" "$LIBSH_LOG_PREFIX" "$*"
 }
