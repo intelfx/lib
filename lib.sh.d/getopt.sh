@@ -6,11 +6,14 @@
 # EXAMPLE=(
 #	[-f]="ARG_FOO"
 #	[--foo]="ARG_FOO"
+#	[--bar:]="ARG_BAR"
+#	[--baz::]="ARG_BAZ"
 #	[--]="ARG_REMAINDER"
 # )
 #
 # All target variables will be unset upon entry.
 # Boolean flags will cause the target variable to be set to 1.
+# ":" and "::" suffixes to option names will be treated similar to getopt(1).
 #
 parse_args() {
 	local opts=() optstring
