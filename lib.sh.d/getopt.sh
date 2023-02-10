@@ -8,14 +8,20 @@
 #	[--foo]="ARG_FOO"
 #	[--bar:]="ARG_BAR"
 #	[--baz::]="ARG_BAZ"
+#	[-q|--quux:]="ARG_QUUX"
 #	[--]="ARG_REMAINDER"
 # )
 #
 # All target variables will be unset upon entry.
 # Boolean flags will cause the target variable to be set to 1.
 # ":" and "::" suffixes to option names will be treated similar to getopt(1).
+# Multiple options may be joined with a "|" in a single key; in this case only a single suffix shall be provided.
 #
 parse_args() {
+	eval "$(ltraps)"
+	ltrap "eval '$(shopt -p extglob)'"
+	shopt -s extglob
+
 	local opts=() optstring
 	local longopts=() longoptstring
 	local args=( "${@:2}" ) parsed_args
@@ -23,7 +29,22 @@ parse_args() {
 	declare -A arg_to_target
 	declare -A arg_to_valspec
 
-	local key value
+	local key value flag
+	declare -a keys
+	for key in "${!spec[@]}"; do
+		if [[ $key == *"|"* ]]; then
+			value="${spec["$key"]}"
+			unset spec["$key"]
+
+			flag="${key##*([^:])}"
+			key="${key%%*(:)}"
+			echo -n "$key" | readarray -d'|' -t keys
+			for key in "${keys[@]}"; do
+				spec["$key$flag"]="$value"
+			done
+		fi
+	done
+
 	local key_dashes key_name key_valspec
 	for key in "${!spec[@]}"; do
 		value="${spec[$key]}"
