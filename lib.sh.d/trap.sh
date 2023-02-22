@@ -50,3 +50,34 @@ lruntrap() {
 	__traps=( "${__traps[@]:1}" )
 	eval "$__t" || true
 }
+
+# returns a value (<= 0) that encodes the current depth of the trap stack
+ltrap_mark() {
+	printf "%s" "-${#__traps[@]}"
+}
+
+# $1: either how many traps to run (>0) or a mark (<=0)
+#     NOTE: `$1 == 0`` is a mark, meaning "run all traps"
+ltrap_unwind() {
+	local __nr="$1"
+	if (( __nr <= 0 )); then
+		(( __nr += ${#__traps[@]} )) ||:
+	fi
+
+	dbg "lruntraps: \$1=$1, #traps=${#__traps[@]}"
+	if (( __nr == 0 )); then
+		return
+	elif (( __nr < 0 )); then
+		# rolling back to a mark above the stack is not an error
+		warn "lruntraps: mark above stack: \$1=$1, #traps=${#__traps[@]}"
+		return
+	elif (( __nr > ${#__traps[@]} )); then
+		die "lruntraps: invalid argument: \$1=$1, #traps=${#__traps[@]}"
+	fi
+
+	local __t
+	for __t in "${__traps[@]:0:$__nr}"; do
+		eval "$__t" || true
+	done
+	__traps=( "${__traps[@]:$__nr}" )
+}
