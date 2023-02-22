@@ -36,15 +36,17 @@ globaltraps() {
 }
 
 ltrap() {
-	__traps+=("$1")
+	# prepend
+	__traps=( "$1" "${__traps[@]}" )
 }
 
 luntrap() {
-	unset __traps[-1]
+	# remove first item
+	__traps=( "${traps[@]:1}" )
 }
 
 lruntrap() {
-	local __t="${__traps[-1]}"
-	unset __traps=[-1]
+	local __t="${__traps[0]}"
+	__traps=( "${__traps[@]:1}" )
 	eval "$__t"
 }
