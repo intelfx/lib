@@ -24,14 +24,14 @@
 ltraps() {
 	cat <<-"EOF"
 	declare -a __traps;
-	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t"; done; trap - RETURN' RETURN
+	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - RETURN' RETURN
 	EOF
 }
 
 globaltraps() {
 	cat <<-"EOF"
 	declare -a __traps;
-	trap '__rc=$?; __t=""; for __t in "${__traps[@]}"; do eval "$__t"; done; trap - EXIT; exit "$__rc";' EXIT
+	trap '__rc=$?; __t=""; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
 
@@ -48,5 +48,5 @@ luntrap() {
 lruntrap() {
 	local __t="${__traps[0]}"
 	__traps=( "${__traps[@]:1}" )
-	eval "$__t"
+	eval "$__t" || true
 }
