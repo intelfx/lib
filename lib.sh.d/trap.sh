@@ -20,6 +20,12 @@
 #  ltrap "rm -rf /"
 #  luntrap
 #
+# NOTE: if `set -e` is used, globaltraps must be active for _any_ traps
+#       to run on error. Otherwise the shell will exit without running
+#       any traps because errors are not converted into returns.
+#       If globaltraps is active, it will run all currently active scopes
+#       before exiting.
+#
 
 ltraps() {
 	cat <<-"EOF"
@@ -31,7 +37,7 @@ ltraps() {
 globaltraps() {
 	cat <<-"EOF"
 	declare -a __traps;
-	trap '__rc=$?; __t=""; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - EXIT; exit "$__rc";' EXIT
+	trap '__rc=$?; __t=""; while [[ ${__traps+set} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; unset __traps; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
 
