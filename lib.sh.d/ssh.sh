@@ -23,15 +23,12 @@ function ssh_prep() {
 
 	dbg "ssh: host '$host' parsed as user='$user' addr='$addr' port='$port'"
 
-	# FIXME: drop -4
-	if ! ping -4 -c 1 -w 5 -q "$addr"; then
+	if ! ping -c 1 -w 5 -q "$addr"; then
 		die "ssh: address '$addr' is unresponsive, exiting"
 	fi
 
 	local ssh_args
 	ssh_args=(
-		# FIXME: drop -4
-		-4
 		-o BatchMode=yes
 		-o UserKnownHostsFile=/dev/null
 		-o StrictHostKeyChecking=no
