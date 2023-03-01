@@ -1,26 +1,50 @@
 #!/bin/bash
 
+# log message priority prefixes
+declare -A _LIBSH_PREFIX
+if [[ $JOURNAL_STREAM ]]; then
+	_LIBSH_PREFIX=(
+		[debug]='<7>'
+		[info]='<6>'
+		[notice]='<5>'
+		[warning]='<4>'
+		[error]='<3>'
+	)
+fi
+
+# log message priorities by type
+declare -A _LIBSH_PRIO
+_LIBSH_PRIO=(
+	[dbg]=debug
+	[log]=info
+	[say]=info
+	[trace]=notice
+	[loud]=notice
+	[warn]=warning
+	[err]=error
+)
+
 function _libsh_log() {
-	local marker="$1" prefix="$2" text="$3"
-	echo "${marker:+$marker }${prefix:+$prefix: }$text" >&2
+	local priority="$1" marker="$2" prefix="$3" text="$4"
+	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
 }
 
 function dbg() {
 	if (( LIBSH_DEBUG )); then
-		_libsh_log "DBG:" "$LIBSH_LOG_PREFIX" "$*"
+		_libsh_log "${_LIBSH_PRIO[dbg]}" "DBG:" "$LIBSH_LOG_PREFIX" "$*"
 	fi
 }
 
 function log() {
-	_libsh_log "::" "$LIBSH_LOG_PREFIX" "$*"
+	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$*"
 }
 
 function say() {
-	_libsh_log "" "" "$*"
+	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*" >&2
 }
 
 function warn() {
-	_libsh_log "W:" "$LIBSH_LOG_PREFIX" "$*"
+	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
 
 function warning() {
@@ -28,7 +52,7 @@ function warning() {
 }
 
 function err() {
-	_libsh_log "E:" "$LIBSH_LOG_PREFIX" "$*"
+	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$*"
 }
 
 function die() {
@@ -37,7 +61,7 @@ function die() {
 }
 
 function trace() {
-	_libsh_log "->" "$LIBSH_LOG_PREFIX" "$*"
+	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	"$@"
 }
 
@@ -65,6 +89,7 @@ function usage() {
 }
 
 function loud() {
+	local prio="${_LIBSH_PRIO[loud]}"
 	local args=( "$@" )
 	local len=0
 	local a
@@ -75,12 +100,12 @@ function loud() {
 	done
 
 	local header="$(repeat '=' "$(( 5 + len + 5 ))")"
-	echo "$header" >&2
+	_libsh_log "$prio" "" "" "$header"
 	for a in "${args[@]}"; do
 		local pad_l="$(repeat ' ' "$(( (len - ${#a}    ) / 2 ))")"  # rounded down
 		local pad_r="$(repeat ' ' "$(( (len - ${#a} + 1) / 2 ))")"  # rounded up
-		echo "==== ${pad_l}${a}${pad_r} ====" >&2
+		_libsh_log "$prio" "" "" "==== ${pad_l}${a}${pad_r} ===="
 	done
-	echo "$header" >&2
+	_libsh_log "$prio" "" "" "$header"
 }
 
