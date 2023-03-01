@@ -37,6 +37,7 @@ function ssh_prep() {
 	if [[ "$identity" ]]; then
 		ssh_args+=(
 			-i "$identity"
+			-o IdentitiesOnly=yes
 		)
 	fi
 
