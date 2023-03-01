@@ -51,7 +51,7 @@ function ssh_prep() {
 	)
 	do_ssh() {
 		dbg "ssh: will run ${ssh_cmd[*]} $*"
-		"${ssh_cmd[@]}" "$@"
+		"${ssh_cmd[@]}" "$@" || die "ssh: ssh failed ($?), exiting"
 	}
 	sftp_cmd=(
 		sftp
@@ -61,6 +61,6 @@ function ssh_prep() {
 	)
 	do_sftp() {
 		dbg "ssh: will run ${sftp_cmd[*]} $*"
-		"${sftp_cmd[@]}" "$@"
+		"${sftp_cmd[@]}" "$@" || die "ssh: sftp failed ($?), exiting"
 	}
 }
