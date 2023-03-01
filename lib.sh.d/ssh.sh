@@ -11,21 +11,21 @@
 # error handling: die()
 function ssh_prep() {
 	if ! [[ "$host" ]]; then
-		die "$0: ssh: host not provided, exiting"
+		die "ssh: host not provided, exiting"
 	fi
 
 	if ! [[ "$host" =~ ^(([^@]+)@)?(.+)(:([0-9]+))?$ ]]; then
-		die "$0: ssh: host '$host' is invalid, exiting"
+		die "ssh: host '$host' is invalid, exiting"
 	fi
 	user="${BASH_REMATCH[2]}"
 	addr="${BASH_REMATCH[3]}"
 	port="${BASH_REPATCH[5]}"
 
-	dbg "$0: ssh: host '$host' parsed as user='$user' addr='$addr' port='$port'"
+	dbg "ssh: host '$host' parsed as user='$user' addr='$addr' port='$port'"
 
 	# FIXME: drop -4
 	if ! ping -4 -c 1 -w 5 -q "$addr"; then
-		die "$0: ssh: address '$addr' is unresponsive, exiting"
+		die "ssh: address '$addr' is unresponsive, exiting"
 	fi
 
 	local ssh_args
@@ -50,7 +50,7 @@ function ssh_prep() {
 		"${user:-root}@$addr"
 	)
 	do_ssh() {
-		dbg "$0: ssh: will run ${ssh_cmd[*]} $*"
+		dbg "ssh: will run ${ssh_cmd[*]} $*"
 		"${ssh_cmd[@]}" "$@"
 	}
 	sftp_cmd=(
@@ -60,7 +60,7 @@ function ssh_prep() {
 		"${user:-root}@$addr"
 	)
 	do_sftp() {
-		dbg "$0: ssh: will run ${sftp_cmd[*]} $*"
+		dbg "ssh: will run ${sftp_cmd[*]} $*"
 		"${sftp_cmd[@]}" "$@"
 	}
 }
