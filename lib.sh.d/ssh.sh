@@ -1,15 +1,9 @@
 #!/bin/bash
 
 # in: $host: [user@]host[:port]
-# in: $identity: path to ssh private key
-# in: $@: additional ssh arguments
-# out: ssh_args=(): internal
-# out: do_ssh(): ssh to $host using $identity
-# out: do_sftp(): sftp to $host using $identity
-# out: do_scp(): scp to $host using $identity
-# out: $user, $addr, $port: parsed $host
+# out: $addr, $user, $port
 # error handling: die()
-function ssh_prep() {
+function ssh_prep_parse_host() {
 	if ! [[ "$host" ]]; then
 		die "ssh: host not provided, exiting"
 	fi
@@ -22,6 +16,21 @@ function ssh_prep() {
 	port="${BASH_REPATCH[5]}"
 
 	dbg "ssh: host '$host' parsed as user='$user' addr='$addr' port='$port'"
+}
+
+# in: $host: [user@]host[:port] OR $addr + $user (optional) + $port (optional)
+# in: $identity: path to ssh private key
+# in: $@: additional ssh arguments
+# out: ssh_args=(): internal
+# out: do_ssh(): ssh to $host using $identity
+# out: do_sftp(): sftp to $host using $identity
+# out: do_scp(): scp to $host using $identity
+# out: $user, $addr, $port: parsed $host
+# error handling: die()
+function ssh_prep() {
+	if ! [[ $addr ]]; then
+		ssh_prep_parse_host
+	fi
 
 	if ! ping -c 1 -w 5 -q "$addr"; then
 		die "ssh: address '$addr' is unresponsive, exiting"
