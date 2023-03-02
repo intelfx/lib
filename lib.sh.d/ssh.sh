@@ -20,6 +20,8 @@ function ssh_prep_parse_host() {
 
 # in: $host: [user@]host[:port] OR $addr + $user (optional) + $port (optional)
 # in: $identity: path to ssh private key
+# in: $known_hosts: path to a custom known_hosts file
+#                   (optional; set to "" to use default known_hosts, otherwise /dev/null if unset)
 # in: $@: additional ssh arguments
 # out: ssh_args=(): internal
 # out: do_ssh(): ssh to $host using $identity
@@ -39,16 +41,25 @@ function ssh_prep() {
 	local ssh_args
 	ssh_args=(
 		-o BatchMode=yes
-		-o UserKnownHostsFile=/dev/null
 		-o StrictHostKeyChecking=no
-		"$@"
 	)
+
+	if [[ "$known_hosts" ]]; then
+		# pass known_hosts file if $known_hosts is set
+		ssh_args+=( -o UserKnownHostsFile="$known_hosts" )
+	elif ! [[ ${known_hosts+set} ]]; then
+		# pass /dev/null UNLESS $known_hosts is set to an empty string
+		ssh_args+=( -o UserKnownHostsFile=/dev/null )
+	fi
 	if [[ "$identity" ]]; then
+		# pass identity (private key) if $identity is set
 		ssh_args+=(
-			-i "$identity"
 			-o IdentitiesOnly=yes
+			-i "$identity"
 		)
 	fi
+	# append the remaining ssh options
+	ssh_args+=( "$@" )
 
 	ssh_cmd=(
 		ssh
