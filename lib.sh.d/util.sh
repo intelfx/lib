@@ -55,6 +55,7 @@ dn() {
 	case "$dirname" in
 	"$1") echo . ;;  # $1 contains no slashes
 	"")   echo / ;;  # $1 contains a single slash in the starting position
+	"${1%/}") dn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
 	*)    echo "$dirname" ;;
 	esac
 }
