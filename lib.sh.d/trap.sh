@@ -48,7 +48,7 @@ ltrap() {
 
 luntrap() {
 	# remove first item
-	__traps=( "${traps[@]:1}" )
+	__traps=( "${__traps[@]:1}" )
 }
 
 lruntrap() {
