@@ -65,6 +65,7 @@ bn() {
 	local basename="${1##*/}"
 	case "$basename" in
 	"$1") echo "$1" ;;  # $1 contains no slashes
+	"${1%/}") echo / ;;  # $1 is a single slash (or contains no slashes)
 	"")   bn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
 	*)    echo "$basename" ;;
 	esac
