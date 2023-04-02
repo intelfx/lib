@@ -49,6 +49,18 @@ split_into() {
 	read -ra out <<< "$in"
 }
 
+# "dirname split"
+# $(dn_part $foo)$(bn $foo) == $foo
+dn_slash() {
+	local dn="${1%/*}"
+	case "$dn" in
+	"$1") echo   ;;  # $1 contains no slashes
+	"")   echo / ;;  # $1 contains a single slash in the starting position
+	"${1%/}") dn_part "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
+	*)    echo "$dn/" ;;
+	esac
+}
+
 # dirname
 dn() {
 	local dirname="${1%/*}"
