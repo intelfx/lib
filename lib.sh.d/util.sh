@@ -59,6 +59,16 @@ dn() {
 	esac
 }
 
+# basename
+bn() {
+	local basename="${1##*/}"
+	case "$basename" in
+	"$1") echo "$1" ;;  # $1 contains no slashes
+	"")   bn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
+	*)    echo "$basename" ;;
+	esac
+}
+
 scriptdir() {
 	echo "$(dn "$(realpath -qe "${BASH_SOURCE[1]}")")"
 }
