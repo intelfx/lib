@@ -65,6 +65,22 @@ function trace() {
 	"$@"
 }
 
+function check() {
+	local stmt="$1"
+	shift
+	if ! eval "$stmt"; then
+		die "$*"
+	fi
+}
+
+function check_e() {
+	local expr="$1"
+	shift
+	if ! eval "[[ $expr ]]"; then
+		die "$*"
+	fi
+}
+
 function assert() {
 	local stmt="$1"
 	shift
