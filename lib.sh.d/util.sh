@@ -198,6 +198,16 @@ repeat() {
 	fi
 }
 
+pad() {
+	local target="$1" arg="$2"
+	local len="${#arg}"
+	if (( len >= target )); then
+		echo "$arg"
+	else
+		echo "$arg$(repeat ' ' $(( target-len )))"
+	fi
+}
+
 maybe_find() {
 	local has_paths=0
 
