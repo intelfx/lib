@@ -5,7 +5,7 @@ shopt -s lastpipe
 
 __libsh="$(realpath -qe "${BASH_SOURCE}").d"
 if ! [[ -d "$__libsh" ]]; then
-	echo "lib.sh: $__libsh does not exist!"
+	echo "lib.sh: lib.sh.d does not exist!" >&2
 	return 1
 fi
 
