@@ -135,6 +135,11 @@ readset() {
 	makeset "$name" "$value" "${array[@]}"
 }
 
+readarray_append() {
+	declare -n target="${@: -1}"
+	readarray -O "${#target[@]}" "$@"
+}
+
 var_copy() {
 	local src="$1" dest="$2"
 	local p="$(declare -p "$src")"
