@@ -49,13 +49,37 @@ split_into() {
 	read -ra out <<< "$in"
 }
 
+# "dirname split"
+# $(dn_part $foo)$(bn $foo) == $foo
+dn_slash() {
+	local dn="${1%/*}"
+	case "$dn" in
+	"$1") echo   ;;  # $1 contains no slashes
+	"")   echo / ;;  # $1 contains a single slash in the starting position
+	"${1%/}") dn_part "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
+	*)    echo "$dn/" ;;
+	esac
+}
+
 # dirname
 dn() {
 	local dirname="${1%/*}"
 	case "$dirname" in
 	"$1") echo . ;;  # $1 contains no slashes
 	"")   echo / ;;  # $1 contains a single slash in the starting position
+	"${1%/}") dn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
 	*)    echo "$dirname" ;;
+	esac
+}
+
+# basename
+bn() {
+	local basename="${1##*/}"
+	case "$basename" in
+	"$1") echo "$1" ;;  # $1 contains no slashes
+	"${1%/}") echo / ;;  # $1 is a single slash (or contains no slashes)
+	"")   bn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
+	*)    echo "$basename" ;;
 	esac
 }
 
@@ -176,6 +200,16 @@ repeat() {
 			out="${out// /$in}"
 		fi
 		echo "$out"
+	fi
+}
+
+pad() {
+	local target="$1" arg="$2"
+	local len="${#arg}"
+	if (( len >= target )); then
+		echo "$arg"
+	else
+		echo "$arg$(repeat ' ' $(( target-len )))"
 	fi
 }
 

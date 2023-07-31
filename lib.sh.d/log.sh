@@ -72,17 +72,35 @@ function dry_run() {
 	fi
 }
 
+function check() {
+	local stmt="$1"
+	shift
+	if ! eval "$stmt"; then
+		die "$*"
+	fi
+}
+
+function check_e() {
+	local expr="$1"
+	shift
+	if ! eval "[[ $expr ]]"; then
+		die "$*"
+	fi
+}
+
 function assert() {
 	local stmt="$1"
+	shift
 	if ! eval "$stmt"; then
-		die "assertion failed: $stmt ($(eval "echo $stmt"))"
+		die "assertion failed: $stmt ($(eval "echo $stmt"))${*+": $*"}"
 	fi
 }
 
 function assert_e() {
 	local expr="$1"
+	shift
 	if ! eval "[[ $expr ]]"; then
-		die "assertion failed: $expr ($(eval "echo $expr"))"
+		die "assertion failed: $expr ($(eval "echo $expr"))${*+": $*"}"
 	fi
 }
 
