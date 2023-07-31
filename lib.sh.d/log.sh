@@ -65,6 +65,13 @@ function trace() {
 	"$@"
 }
 
+function dry_run() {
+	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
+	if ! (( DRY_RUN )); then
+		"$@"
+	fi
+}
+
 function assert() {
 	local stmt="$1"
 	if ! eval "$stmt"; then
