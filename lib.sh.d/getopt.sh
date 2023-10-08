@@ -118,3 +118,70 @@ parse_args() {
 		unset -n target
 	done
 }
+
+# get_arg <TARGET VAR> <SHIFT COUNT VAR> <FORMS...> -- [INPUT ARGS]
+# $1: target variable name
+# $2: shift variable name
+# $3...: argument forms (short or long)
+# $n: "--"
+# $n+1...: input
+function get_arg() {
+	# read namerefs
+	declare -n target="$1" shift_nr="$2"
+	shift 2
+	# read forms until "--"
+	declare -a short long
+	while (( $# )); do
+		case "$1" in
+		--) shift; break;;
+		-[a-zA-Z0-9]) short+=( "$1" ); shift;;
+		--*) long+=( "$1" ); shift;;
+		*) die "get_arg: unexpected form \"$1\""
+		esac
+	done
+
+	local f
+	for f in "${long[@]}"; do
+		if (( $# >= 2 )) && [[ $1 == $f ]]; then
+			target="$2"
+			shift_nr=2
+			return 0
+		elif (( $# >= 1 )) && [[ $1 == $f=* ]]; then
+			target="${1#$f=}"
+			shift_nr=1
+			return 0
+		fi
+	done
+	shift_nr=0
+	return 1
+}
+
+function get_flag() {
+	# read namerefs
+	declare -n target="$1" shift_nr="$2"
+	shift 2
+	# read forms until "--"
+	declare -a forms
+	while (( $# )); do
+		case "$1" in
+		--) shift; break;;
+		-*) forms+=( "$1" ); shift;;
+		*) die "get_arg: unexpected form \"$1\""
+		esac
+	done
+
+	local f
+	for f in "${forms[@]}"; do
+		if (( $# >= 1 )) && [[ $1 == $f ]]; then
+			target="$2"
+			shift_nr=2
+			return 0
+		elif (( $# >= 1 )) && [[ $1 == $f=* ]]; then
+			target="${1#$f=}"
+			shift_nr=1
+			return 0
+		fi
+	done
+	shift_nr=0
+	return 1
+}
