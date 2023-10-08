@@ -213,6 +213,26 @@ pad() {
 	fi
 }
 
+stderr_is_stdout() {
+	if [[ /proc/self/fd/1 -ef /proc/self/fd/2 ]]; then
+		# Linux and /proc exists, and stdout == stderr
+		return 0
+	elif [[ -e /proc/self/fd/1 && -e /proc/self/fd/2 ]]; then
+		# Linux and /proc exists, but stdout != stderr
+		return 1
+	elif [[ /dev/stdout -ef /dev/stderr ]]; then
+		# try /dev/stdout and /dev/stderr
+		# on Linux, those will be symlinks to procfs (maybe it's mounted elsewhere)
+		return 0
+	elif [[ -t 1 && -t 2 ]]; then
+		# heuristic: if both are terminal, chances are it's the same terminal
+		return 0
+	else
+		# otherwise assume stdout != stderr
+		return 1
+	fi
+}
+
 maybe_find() {
 	local has_paths=0
 
