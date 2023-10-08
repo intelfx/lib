@@ -38,9 +38,9 @@ join1() {
 }
 
 join() {
-	local sep="$1" arg0="$2"
+	local sep="$1" arg0="$2" IFS=''
 	shift 2
-	echo "$arg0${@/#/$sep}"
+	echo "$arg0${*/#/$sep}"
 }
 
 split_into() {
