@@ -10,6 +10,7 @@
 #	[--baz::]="ARG_BAZ"
 #	[-q|--quux:]="ARG_QUUX"
 #	[--]="ARG_REMAINDER"
+#	[getopt]="+-"
 # )
 #
 # All target variables will be unset upon entry.
@@ -22,12 +23,19 @@ parse_args() {
 	ltrap "eval '$(shopt -p extglob)'"
 	shopt -s extglob
 
+	local modes
 	local opts=() optstring
 	local longopts=() longoptstring
 	local args=( "${@:2}" ) parsed_args
 	declare -n spec="$1"
 	declare -A arg_to_target
 	declare -A arg_to_valspec
+
+	# pass parsing modes ("+" or "-")
+	if [[ "${spec[getopt]+set}" ]]; then
+		modes="${spec[getopt]}"
+		unset spec[getopt]
+	fi
 
 	local key value flag
 	declare -a keys
@@ -74,7 +82,7 @@ parse_args() {
 		declare -n target="$value"; unset target; unset -n target
 	done
 
-	optstring="$(IFS=""; echo "${opts[*]}")"
+	optstring="${modes}$(IFS=""; echo "${opts[*]}")"
 	longoptstring="$(IFS=","; echo "${longopts[*]}")"
 
 	parsed_args="$(getopt -o "$optstring" ${longoptstring:+--long "$longoptstring"} -- "${args[@]}")" || return
