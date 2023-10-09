@@ -107,7 +107,7 @@ function assert_e() {
 function usage() {
 	if (( $# )); then
 		if [[ "$*" ]]; then
-			err "$@"
+			_libsh_log "${_LIBSH_PRIO[err]}" "" "$LIBSH_LOG_PREFIX" "$*"
 		fi
 		echo >&2
 	fi
