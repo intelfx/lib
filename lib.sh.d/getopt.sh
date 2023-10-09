@@ -85,7 +85,7 @@ parse_args() {
 	optstring="${modes}$(IFS=""; echo "${opts[*]}")"
 	longoptstring="$(IFS=","; echo "${longopts[*]}")"
 
-	parsed_args="$(getopt -o "$optstring" ${longoptstring:+--long "$longoptstring"} -- "${args[@]}")" || return
+	parsed_args="$(getopt -n "$0" -o "$optstring" ${longoptstring:+--long "$longoptstring"} -- "${args[@]}")" || return
 	eval set -- "$parsed_args"
 
 	local arg valspec
