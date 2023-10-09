@@ -106,7 +106,9 @@ function assert_e() {
 
 function usage() {
 	if (( $# )); then
-		err "$@"
+		if [[ "$*" ]]; then
+			err "$@"
+		fi
 		echo >&2
 	fi
 	_usage >&2
@@ -133,4 +135,3 @@ function loud() {
 	done
 	_libsh_log "$prio" "" "" "$header"
 }
-
