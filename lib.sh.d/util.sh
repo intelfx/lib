@@ -83,6 +83,20 @@ bn() {
 	esac
 }
 
+joinpath() {
+	local r arg
+	for arg; do
+		if [[ ! $r || $r == . ]]; then
+			r="$arg"
+		elif [[ $arg == /* ]]; then
+			r="$arg"
+		else
+			r="$r/$arg"
+		fi
+	done
+	echo "$r"
+}
+
 scriptdir() {
 	echo "$(dn "$(realpath -qe "${BASH_SOURCE[1]}")")"
 }
