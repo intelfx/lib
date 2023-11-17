@@ -4,7 +4,7 @@
 # $2...: arguments to parse
 #
 # EXAMPLE=(
-#	[-f]="ARG_FOO"
+#	[-f]="ARG_FOO default=TRUE"
 #	[--foo]="ARG_FOO"
 #	[--bar:]="ARG_BAR"
 #	[--baz::]="ARG_BAZ"
@@ -14,9 +14,20 @@
 # )
 #
 # All target variables will be unset upon entry.
-# Boolean flags will cause the target variable to be set to 1.
+# Boolean flags will cause the target variable to be set to 1, or the default (see below).
 # ":" and "::" suffixes to option names will be treated similar to getopt(1).
 # Multiple options may be joined with a "|" in a single key; in this case only a single suffix shall be provided.
+# Target variable name may be followed by 0 or more items, separated by spaces,
+# which affect parse_args' behavior when the option is encountered.
+# Possible items include:
+# - default=X
+#     store "X" if the option has no value
+#     (only possible for flags and optional-argument options)
+#     (_no_ value is not the same as _empty_ value)
+#      ex. --foo    has no value
+#          --bar='' has empty value
+#          --baz    has no value
+#          --baz='' has empty value
 #
 parse_args() {
 	eval "$(ltraps)"
@@ -31,12 +42,17 @@ parse_args() {
 	declare -A arg_to_target
 	declare -A arg_to_valspec
 
+	declare -A arg_default
+	local DEFAULT=1
+
 	# pass parsing modes ("+" or "-")
 	if [[ "${spec[getopt]+set}" ]]; then
 		modes="${spec[getopt]}"
 		unset spec[getopt]
 	fi
 
+	# preprocess compound keys ("-a|--arg")
+	# currently, we split them into identical entries for each key
 	local key value flag
 	declare -a keys
 	for key in "${!spec[@]}"; do
@@ -53,6 +69,7 @@ parse_args() {
 		fi
 	done
 
+	# parse keys (--, -a, --arg, : and ::)
 	local key_dashes key_name key_valspec
 	for key in "${!spec[@]}"; do
 		value="${spec[$key]}"
@@ -78,8 +95,38 @@ parse_args() {
 			err "parse_args: bad key: [$key]=$value"
 			return 1
 		fi
+	done
 
+	# postprocess values (extract items such as default=X, split=Y)
+	declare -a value_items
+	local item
+	for key in "${!arg_to_target[@]}"; do
+		value="${arg_to_target["$key"]}"
+
+		# split on whitespace
+		IFS=' '; value_items=( $value ); unset IFS
+		if ! (( ${#value_items[@]} > 1 )); then
+			continue
+		fi
+
+		# first item is the actual target variable name
+		value="${value_items[0]}"
+		arg_to_target["$key"]="$value"
+		# while we have the name, clear (unset) target variable
 		declare -n target="$value"; unset target; unset -n target
+
+		# next items are behavior modifiers
+		for item in "${value_items[@]:1}"; do
+			case "$item" in
+			default=*)
+				arg_default[$key]="${item#default=}"
+				;;
+			*)
+				err "parse_args: bad item: [$key]=$value (item: $item)"
+				return 1
+				;;
+			esac
+		done
 	done
 
 	optstring="${modes}$(IFS=""; echo "${opts[*]}")"
@@ -88,7 +135,7 @@ parse_args() {
 	parsed_args="$(getopt -n "$0" -o "$optstring" ${longoptstring:+--long "$longoptstring"} -- "${args[@]}")" || return
 	eval set -- "$parsed_args"
 
-	local arg valspec
+	local arg valspec dfl count
 	while (( $# )); do
 		if [[ $1 == -- ]] && ! [[ ${arg_to_target[$1]} ]]; then
 			if (( $# > 1 )); then
@@ -102,20 +149,30 @@ parse_args() {
 
 		declare -n target="${arg_to_target[$1]}"
 
+		# special case
 		if [[ $1 == -- ]]; then
 			target=( "${@:2}" )
-			shift $#
-		else
-			valspec="${arg_to_valspec[$1]}"
-			case "$valspec" in
-			'') target="1"; shift ;;
-			':') target="$2"; shift 2 ;;
-			'::') target="$2"; shift 2 ;;
-			*) die "parse_args: Internal error" ;;
-			esac
+			return
 		fi
 
+		# get value
+		valspec="${arg_to_valspec[$1]}"
+		case "$valspec" in
+		'') dfl=1; value=""; count=1 ;;
+		':') dfl=0; value="$2"; count=2 ;;
+		'::') dfl=1; value="$2"; count=2 ;;
+		*) die "parse_args: Internal error" ;;
+		esac
+		# apply default (if needed)
+		if [[ ! $value ]] && (( dfl )); then
+			value="${arg_default[$1]-$DEFAULT}"
+		fi
+
+		# apply value to target
+		target="$value"
+
 		unset -n target
+		shift "$count"
 	done
 }
 
