@@ -6,7 +6,7 @@
 # EXAMPLE=(
 #	[-f]="ARG_FOO default=TRUE"
 #	[--foo]="ARG_FOO"
-#	[--bar:]="ARG_BAR"
+#	[--bar:]="ARG_BAR split=, append"
 #	[--baz::]="ARG_BAZ"
 #	[-q|--quux:]="ARG_QUUX"
 #	[--]="ARG_REMAINDER"
@@ -28,6 +28,10 @@
 #          --bar='' has empty value
 #          --baz    has no value
 #          --baz='' has empty value
+# - split=X:
+#     split the argument on "X" and store the results in an array variable
+# - append:
+#     append the argument (after possible splitting) to an array variable
 #
 parse_args() {
 	eval "$(ltraps)"
@@ -42,6 +46,9 @@ parse_args() {
 	declare -A arg_to_target
 	declare -A arg_to_valspec
 
+	declare -A arg_is_array
+	declare -A arg_append
+	declare -A arg_delim
 	declare -A arg_default
 	local DEFAULT=1
 
@@ -118,6 +125,14 @@ parse_args() {
 		# next items are behavior modifiers
 		for item in "${value_items[@]:1}"; do
 			case "$item" in
+			append)
+				arg_is_array[$key]=1
+				arg_append[$key]=1
+				;;
+			split=*)
+				arg_is_array[$key]=1
+				arg_delim[$key]="${item#split=}"
+				;;
 			default=*)
 				arg_default[$key]="${item#default=}"
 				;;
@@ -168,8 +183,34 @@ parse_args() {
 			value="${arg_default[$1]-$DEFAULT}"
 		fi
 
-		# apply value to target
-		target="$value"
+		# apply value to target according to flags
+		# XXX: this is a war crime
+		if [[ ${arg_is_array[$1]+set} ]]; then
+			if [[ ${arg_delim[$1]+set} ]]; then
+				if [[ ${arg_append[$1]+set} ]]; then
+					echo -n "$value" \
+					| readarray \
+						-t \
+						-d "${arg_delim[$1]}" \
+						-O "${#target[@]}" \
+						target
+				else
+					echo -n "$value" \
+					| readarray \
+						-t \
+						-d "${arg_delim[$1]}" \
+						target
+				fi
+			else
+				if [[ ${arg_append[$1]+set} ]]; then
+					target+=( "$value" )
+				else
+					target=( "$value" )
+				fi
+			fi
+		else
+			target="$value"
+		fi
 
 		unset -n target
 		shift "$count"
