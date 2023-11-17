@@ -168,6 +168,7 @@ parse_args() {
 		# special case
 		if [[ $1 == -- ]]; then
 			target=( "${@:2}" )
+			unset -n target
 			return
 		fi
 
