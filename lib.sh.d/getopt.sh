@@ -24,10 +24,11 @@
 #     store "X" if the option has no value
 #     (only possible for flags and optional-argument options)
 #     (_no_ value is not the same as _empty_ value)
+#     (HOWEVER, optional-argument options currently treat empty value as no value)
 #      ex. --foo    has no value
 #          --bar='' has empty value
 #          --baz    has no value
-#          --baz='' has empty value
+#          --baz='' has empty value BUT is treated like there's no value
 # - split=X:
 #     split the argument on "X" and store the results in an array variable
 # - append:
