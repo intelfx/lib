@@ -159,23 +159,17 @@ parse_args() {
 
 	local arg valspec dfl count
 	while (( $# )); do
-		if [[ $1 == -- ]] && ! [[ ${arg_to_target[$1]} ]]; then
-			if (( $# > 1 )); then
-				err "parse_args: unexpected positional arguments"
-				return 1
-			else
-				shift
-				break
-			fi
-		fi
-
-		declare -n target="${arg_to_target[$1]}"
-
 		# special case
 		if [[ $1 == -- ]]; then
-			target=( "${@:2}" )
-			unset -n target
-			return
+			if [[ ${arg_to_target[$1]+set} ]]; then
+				declare -n target="${arg_to_target[$1]}"
+				target=( "${@:2}" )
+				unset -n target
+			elif (( $# > 1 )); then
+				err "parse_args: unexpected positional arguments"
+				return 1
+			fi
+			return 0
 		fi
 
 		# get value
@@ -190,6 +184,21 @@ parse_args() {
 		if [[ ! $value ]] && (( dfl )); then
 			value="${arg_default[$1]-$DEFAULT}"
 		fi
+
+		# save (passthrough) the original option
+		if [[ ${arg_passthrough[$1]+set} ]]; then
+			declare -n target="${arg_passthrough[$1]}"
+			target+=( "${@:1:$count}" )
+			unset -n target
+		fi
+
+		# shortcut: support options without a target
+		if ! [[ ${arg_to_target[$1]+set} ]]; then
+			shift "$count"
+			continue
+		fi
+
+		declare -n target="${arg_to_target[$1]}"
 
 		# apply value to target according to flags
 		# XXX: this is a war crime
@@ -218,13 +227,6 @@ parse_args() {
 			fi
 		else
 			target="$value"
-		fi
-
-		# save the original option
-		if [[ ${arg_passthrough[$1]+set} ]]; then
-			declare -n passthrough_target="${arg_passthrough[$1]}"
-			passthrough_target+=( "${@:1:$count}" )
-			unset -n passthrough_target
 		fi
 
 		unset -n target
