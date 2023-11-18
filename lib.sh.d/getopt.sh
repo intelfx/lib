@@ -33,6 +33,8 @@
 #     split the argument on "X" and store the results in an array variable
 # - append:
 #     append the argument (after possible splitting) to an array variable
+# - pass=X:
+#     save the original option (and argument, if required) into array "X"
 #
 parse_args() {
 	eval "$(ltraps)"
@@ -51,6 +53,7 @@ parse_args() {
 	declare -A arg_append
 	declare -A arg_delim
 	declare -A arg_default
+	declare -A arg_passthrough
 	local DEFAULT=1
 
 	# pass parsing modes ("+" or "-")
@@ -137,6 +140,9 @@ parse_args() {
 			default=*)
 				arg_default[$key]="${item#default=}"
 				;;
+			pass=*)
+				arg_passthrough[$key]="${item#pass=}"
+				;;
 			*)
 				err "parse_args: bad item: [$key]=$value (item: $item)"
 				return 1
@@ -212,6 +218,13 @@ parse_args() {
 			fi
 		else
 			target="$value"
+		fi
+
+		# save the original option
+		if [[ ${arg_passthrough[$1]+set} ]]; then
+			declare -n passthrough_target="${arg_passthrough[$1]}"
+			passthrough_target+=( "${@:1:$count}" )
+			unset -n passthrough_target
 		fi
 
 		unset -n target
