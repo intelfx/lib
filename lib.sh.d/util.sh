@@ -207,8 +207,8 @@ set_difference_a() {
 	declare -n src1="$1" src2="$2" dest="$3"
 
 	{ grep -z -Fvxf \
-		<(print_array0 "${src1[@]}") \
 		<(print_array0 "${src2[@]}") \
+		<(print_array0 "${src1[@]}") \
 	||:; } | readarray -d '' -t dest
 }
 
@@ -226,8 +226,8 @@ set_difference_A() {
 	local k tmp=()
 
 	{ grep -z -Fvxf \
-		<(print_array0 "${!src1[@]}") \
 		<(print_array0 "${!src2[@]}") \
+		<(print_array0 "${!src1[@]}") \
 	||:; } | readarray -d '' -t tmp
 	for k in "${tmp[@]}"; do
 		dest["$k"]=1
