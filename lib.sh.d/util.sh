@@ -191,6 +191,18 @@ var_copy() {
 	echo "$p"
 }
 
+set_difference_f() {
+	grep -Fvxf "$2" "$1"
+}
+
+set_intersection_f() {
+	grep -Fxf "$2" "$1"
+}
+
+set_union_f() {
+	sort -u "$@"
+}
+
 all_parents() {
 	local d
 	for d; do
