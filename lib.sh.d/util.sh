@@ -221,6 +221,28 @@ set_intersection_a() {
 	| readarray -d '' -t dest
 }
 
+set_difference_A() {
+	declare -n src1="$1" src2="$2" dest="$3"
+	local k tmp=()
+
+	grep -z -Fvxf \
+		<(print_array0 "${!src1[@]}") \
+		<(print_array0 "${!src2[@]}") \
+	| readarray -d '' -t tmp
+	for k in "${tmp[@]}"; do
+		dest["$k"]=1
+	done
+}
+
+set_intersection_A() {
+	declare -n src1="$1" src2="$2" dest="$3"
+
+	grep -z -Fxf \
+		<(print_array0 "${src1[@]}") \
+		<(print_array0 "${src2[@]}") \
+	| readarray -d '' -t dest
+}
+
 all_parents() {
 	local d
 	for d; do
