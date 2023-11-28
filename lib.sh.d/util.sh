@@ -203,6 +203,24 @@ set_union_f() {
 	sort -u "$@"
 }
 
+set_difference_a() {
+	declare -n src1="$1" src2="$2" dest="$3"
+
+	grep -z -Fvxf \
+		<(print_array0 "${src1[@]}") \
+		<(print_array0 "${src2[@]}") \
+	| readarray -d '' -t dest
+}
+
+set_intersection_a() {
+	declare -n src1="$1" src2="$2" dest="$3"
+
+	grep -z -Fxf \
+		<(print_array0 "${src1[@]}") \
+		<(print_array0 "${src2[@]}") \
+	| readarray -d '' -t dest
+}
+
 all_parents() {
 	local d
 	for d; do
