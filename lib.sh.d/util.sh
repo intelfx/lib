@@ -139,6 +139,12 @@ print_array() {
 	fi
 }
 
+print_array0() {
+	if (( $# )); then
+		printf "%s\0" "$@"
+	fi
+}
+
 sort_array() {
 	local name="$1"
 	declare -n array="$name"
