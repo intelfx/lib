@@ -192,43 +192,43 @@ var_copy() {
 }
 
 set_difference_f() {
-	grep -Fvxf "$2" "$1"
+	grep -Fvxf "$2" "$1" ||:
 }
 
 set_intersection_f() {
-	grep -Fxf "$2" "$1"
+	grep -Fxf "$2" "$1" ||:
 }
 
 set_union_f() {
-	sort -u "$@"
+	sort -u "$@" ||:
 }
 
 set_difference_a() {
 	declare -n src1="$1" src2="$2" dest="$3"
 
-	grep -z -Fvxf \
+	{ grep -z -Fvxf \
 		<(print_array0 "${src1[@]}") \
 		<(print_array0 "${src2[@]}") \
-	| readarray -d '' -t dest
+	||:; } | readarray -d '' -t dest
 }
 
 set_intersection_a() {
 	declare -n src1="$1" src2="$2" dest="$3"
 
-	grep -z -Fxf \
+	{ grep -z -Fxf \
 		<(print_array0 "${src1[@]}") \
 		<(print_array0 "${src2[@]}") \
-	| readarray -d '' -t dest
+	||:; } | readarray -d '' -t dest
 }
 
 set_difference_A() {
 	declare -n src1="$1" src2="$2" dest="$3"
 	local k tmp=()
 
-	grep -z -Fvxf \
+	{ grep -z -Fvxf \
 		<(print_array0 "${!src1[@]}") \
 		<(print_array0 "${!src2[@]}") \
-	| readarray -d '' -t tmp
+	||:; } | readarray -d '' -t tmp
 	for k in "${tmp[@]}"; do
 		dest["$k"]=1
 	done
@@ -237,10 +237,10 @@ set_difference_A() {
 set_intersection_A() {
 	declare -n src1="$1" src2="$2" dest="$3"
 
-	grep -z -Fxf \
+	{ grep -z -Fxf \
 		<(print_array0 "${src1[@]}") \
 		<(print_array0 "${src2[@]}") \
-	| readarray -d '' -t dest
+	||:; } | readarray -d '' -t dest
 }
 
 all_parents() {
