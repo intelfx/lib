@@ -247,6 +247,10 @@ stderr_is_stdout() {
 	fi
 }
 
+cat_config() {
+	sed -r 's/[[:space:]]*(#.*)?$//g; /^$/d' "$@"
+}
+
 maybe_find() {
 	local has_paths=0
 
