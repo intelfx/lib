@@ -38,6 +38,11 @@ join1() {
 }
 
 join() {
+	case "$#" in
+	1) return ;;
+	2) echo "$2"; return ;;
+	esac
+
 	local sep="$1" arg0="$2" IFS=''
 	shift 2
 	echo "$arg0${*/#/$sep}"
