@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# log message priority prefixes
+# log message prefixes by priority
 declare -A _LIBSH_PREFIX
 if [[ $JOURNAL_STREAM ]]; then
 	_LIBSH_PREFIX=(
@@ -9,6 +9,7 @@ if [[ $JOURNAL_STREAM ]]; then
 		[notice]='<5>'
 		[warning]='<4>'
 		[error]='<3>'
+		[xxx]='<0>'  # emerg
 	)
 fi
 
@@ -22,6 +23,7 @@ _LIBSH_PRIO=(
 	[loud]=notice
 	[warn]=warning
 	[err]=error
+	[xxx]=xxx
 )
 
 function _libsh_log() {
@@ -58,6 +60,14 @@ function err() {
 function die() {
 	err "$@"
 	exit 1
+}
+
+function xxx() {
+	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$*"
+}
+
+function XXX() {
+	xxx "$@"
 }
 
 function trace() {
