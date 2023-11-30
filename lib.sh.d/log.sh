@@ -40,34 +40,59 @@ function dbg() {
 function log() {
 	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$*"
 }
+function logf() {
+	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+}
 
 function say() {
 	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*"
+}
+function sayf() {
+	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$(printf -- "$@")"
 }
 
 function warn() {
 	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
+function warnf() {
+	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+}
 
 function warning() {
 	warn "$@"
 }
+function warningf() {
+	warnf "$@"
+}
 
 function err() {
 	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$*"
+}
+function errf() {
+	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
 }
 
 function die() {
 	err "$@"
 	exit 1
 }
+function dief() {
+	errf "$@"
+	exit 1
+}
 
 function xxx() {
 	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$*"
 }
+function xxxf() {
+	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+}
 
 function XXX() {
 	xxx "$@"
+}
+function XXXf() {
+	xxxf "$@"
 }
 
 function trace() {
@@ -121,6 +146,12 @@ function usage() {
 		fi
 		echo >&2
 	fi
+	_usage >&2
+	exit 1
+}
+function usagef() {
+	_libsh_log "${_LIBSH_PRIO[err]}" "" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+	echo >&2
 	_usage >&2
 	exit 1
 }
