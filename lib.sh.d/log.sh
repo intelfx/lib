@@ -42,7 +42,7 @@ function log() {
 }
 
 function say() {
-	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*" >&2
+	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*"
 }
 
 function warn() {
