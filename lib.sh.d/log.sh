@@ -30,6 +30,12 @@ function _libsh_log() {
 	local priority="$1" marker="$2" prefix="$3" text="$4"
 	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
 }
+function _libsh_logf() {
+	local priority="$1" marker="$2" prefix="$3" text
+	shift 3
+	printf -v text -- "$@"
+	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
+}
 
 function dbg() {
 	if (( LIBSH_DEBUG )); then
@@ -41,21 +47,21 @@ function log() {
 	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$*"
 }
 function logf() {
-	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+	_libsh_logf "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function say() {
 	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*"
 }
 function sayf() {
-	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$(printf -- "$@")"
+	_libsh_logf "${_LIBSH_PRIO[say]}" "" "" "$@"
 }
 
 function warn() {
 	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function warnf() {
-	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+	_libsh_logf "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function warning() {
@@ -69,7 +75,7 @@ function err() {
 	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function errf() {
-	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+	_libsh_logf "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function die() {
@@ -85,7 +91,7 @@ function xxx() {
 	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function xxxf() {
-	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
+	_libsh_logf "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function XXX() {
