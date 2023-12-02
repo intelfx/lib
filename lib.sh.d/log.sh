@@ -42,6 +42,11 @@ function dbg() {
 		_libsh_log "${_LIBSH_PRIO[dbg]}" "DBG:" "$LIBSH_LOG_PREFIX" "$*"
 	fi
 }
+function dbgf() {
+	if (( LIBSH_DEBUG )); then
+		_libsh_logf "${_LIBSH_PRIO[dbg]}" "DBG:" "$LIBSH_LOG_PREFIX" "$@"
+	fi
+}
 
 function log() {
 	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$*"
