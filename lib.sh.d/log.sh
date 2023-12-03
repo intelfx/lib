@@ -26,6 +26,31 @@ _LIBSH_PRIO=(
 	[xxx]=xxx
 )
 
+# manual implementation of %v and %V printf specifiers
+# %v: outputs the value of the shell variable whose name is the ARGUMENT
+# %V: outputs the definition (as in `declare -p`) of the shell variable
+#     whose name is the ARGUMENT, without the `declare --` prefix
+function _libsh_printf_var() {
+	local var="$1" fmt="$2"
+	shift 2
+	if ! [[ $fmt == *%[Vv]* ]]; then
+		printf -v "$var" -- "$fmt" "$@"
+		return
+	fi
+	local args=( "$@" )
+	local i c=0
+	for (( i=0; i < ${#fmt} - 1; ++i )); do
+		case "${fmt:i:2}" in
+		%%) (( ++i )) ;;
+		%v) args[c]="${!args[c]}"; (( ++c, ++i )) ;;
+		%V) args[c]="$(declare -p "${args[c]}")"; args[c]="${args[c]#declare +(-+([^ ]) )}"; (( ++c, ++i )) ;;
+		%?) (( ++c, ++i )) ;;
+		esac
+	done
+	printf -v "$var" -- "${fmt//%[Vv]/%s}" "${args[@]}"
+
+}
+
 function _libsh_log() {
 	local priority="$1" marker="$2" prefix="$3" text="$4"
 	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
@@ -33,7 +58,7 @@ function _libsh_log() {
 function _libsh_logf() {
 	local priority="$1" marker="$2" prefix="$3" text
 	shift 3
-	printf -v text -- "$@"
+	_libsh_printf_var text "$@"
 	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
 }
 
