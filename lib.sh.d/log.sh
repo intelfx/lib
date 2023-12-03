@@ -2,7 +2,7 @@
 
 # log message prefixes by priority
 declare -A _LIBSH_PREFIX
-if [[ $JOURNAL_STREAM ]]; then
+if [[ $JOURNAL_STREAM && ! -t 2 ]]; then
 	_LIBSH_PREFIX=(
 		[debug]='<7>'
 		[info]='<6>'
