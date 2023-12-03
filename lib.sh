@@ -2,6 +2,7 @@
 
 set -eo pipefail
 shopt -s lastpipe
+shopt -s extglob
 
 __libsh="$(realpath -qe "${BASH_SOURCE}").d"
 if ! [[ -d "$__libsh" ]]; then
