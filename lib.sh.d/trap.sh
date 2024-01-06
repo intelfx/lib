@@ -98,3 +98,20 @@ ltrap_unwind() {
 	done
 	__traps=( "${__traps[@]:$__nr}" )
 }
+
+libsh_export_ltraps() {
+	if [[ ${_LIBSH_HAS_TRAP+set} ]]; then
+		return
+	fi
+	export _LIBSH_HAS_TRAP=1
+	export -f \
+		globaltraps \
+		ltraps \
+		ltrap \
+		luntrap \
+		lruntrap \
+
+	# not exporting mark/unwind because they use logging
+}
+libsh_export_trap() { libsh_export_ltraps; }
+libsh_export_ltrap() { libsh_export_ltraps; }

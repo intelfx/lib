@@ -212,3 +212,28 @@ function loud() {
 	done
 	_libsh_log "$prio" "" "" "$header"
 }
+
+libsh_export_log() {
+	if [[ ${_LIBSH_HAS_LOG+set} ]]; then
+		return
+	fi
+	export _LIBSH_HAS_LOG=1
+	export -f \
+		_libsh_printf_var \
+		_libsh_log \
+		_libsh_logf \
+		dbg dbgf \
+		log logf \
+		say sayf \
+		warn warnf \
+		warning warningf \
+		err errf \
+		die dief \
+		xxx xxxf \
+		XXX XXXf \
+		trace \
+		dry_run \
+
+		#check check_e \
+		#assert assert_e \
+}
