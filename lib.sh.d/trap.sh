@@ -28,6 +28,11 @@
 #
 
 ltraps() {
+	# HACK: forcibly enable globaltraps (see above why)
+	if ! [[ ${__libsh_has_globaltraps+set} ]]; then
+		globaltraps
+	fi
+
 	cat <<-"EOF"
 	declare -a __traps;
 	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - RETURN' RETURN
@@ -35,8 +40,14 @@ ltraps() {
 }
 
 globaltraps() {
+	# guard against repeated setup
+	if [[ ${__libsh_has_globaltraps+set} ]]; then
+		return
+	fi
+
 	cat <<-"EOF"
-	declare -a __traps;
+	declare -g __libsh_has_globaltraps=1;
+	declare -g -a __traps;
 	trap '__rc=$?; __t=""; while [[ ${__traps+set} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; unset __traps; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
