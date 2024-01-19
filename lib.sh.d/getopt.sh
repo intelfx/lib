@@ -147,7 +147,8 @@ parse_args() {
 				arg_default[$key]="${item#default=}"
 				;;
 			pass=*)
-				arg_passthrough[$key]="${item#pass=}"
+				# sic: this is split at whitespace (bash has no nested arrays)
+				arg_passthrough[$key]+=" ${item#pass=}"
 				;;
 			*)
 				err "parse_args: bad item: [$key]=$value (item: $item)"
@@ -164,6 +165,7 @@ parse_args() {
 	eval set -- "$parsed_args"
 
 	local arg valspec dfl count
+	declare -a items
 	while (( $# )); do
 		# special case
 		if [[ $1 == -- ]]; then
@@ -193,9 +195,13 @@ parse_args() {
 
 		# save (passthrough) the original option
 		if [[ ${arg_passthrough[$1]+set} ]]; then
-			declare -n target="${arg_passthrough[$1]}"
-			target+=( "${@:1:$count}" )
-			unset -n target
+			# sic: split passthrough at whitespace (bash has no nested arrays)
+			IFS=' '; items=( ${arg_passthrough[$1]} ); unset IFS
+			for item in "${items[@]}"; do
+				declare -n target="$item"
+				target+=( "${@:1:$count}" )
+				unset -n target
+			done
 		fi
 
 		# shortcut: support options without a target
