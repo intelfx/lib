@@ -116,15 +116,21 @@ parse_args() {
 
 		# split on whitespace
 		IFS=' '; value_items=( $value ); unset IFS
-		if ! (( ${#value_items[@]} > 1 )); then
-			continue
-		fi
 
-		# first item is the actual target variable name
-		value="${value_items[0]}"
-		arg_to_target["$key"]="$value"
-		# while we have the name, clear (unset) target variable
-		declare -n target="$value"; unset target; unset -n target
+		# first item is the actual target variable name,
+		# unless it has a "=" (to support bare "pass=")
+		if [[ ${value_items[0]} != *=* ]]; then
+			# update the target
+			value="${value_items[0]}"
+			arg_to_target["$key"]="$value"
+			# while we have the name, clear (unset) target variable
+			declare -n target="$value"; unset target; unset -n target
+		else
+			# patch something in to let the next loop start from 1
+			value_items=( - "${value_items[@]}" )
+			# delete the bogus target
+			unset arg_to_target["$key"]
+		fi
 
 		# next items are behavior modifiers
 		for item in "${value_items[@]:1}"; do
@@ -193,6 +199,7 @@ parse_args() {
 		fi
 
 		# shortcut: support options without a target
+		# (must come after passthrough to support bare "pass=")
 		if ! [[ ${arg_to_target[$1]+set} ]]; then
 			shift "$count"
 			continue
