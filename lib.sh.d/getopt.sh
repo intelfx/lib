@@ -164,7 +164,7 @@ parse_args() {
 	parsed_args="$(getopt -n "$0" -o "$optstring" ${longoptstring:+--long "$longoptstring"} -- "${args[@]}")" || return
 	eval set -- "$parsed_args"
 
-	local arg valspec dfl count
+	local arg valspec dfl count pcount
 	declare -a items
 	while (( $# )); do
 		# special case
@@ -195,11 +195,17 @@ parse_args() {
 
 		# save (passthrough) the original option
 		if [[ ${arg_passthrough[$1]+set} ]]; then
-			# sic: split passthrough at whitespace (bash has no nested arrays)
+			# XXX: "This getopt(1) treats optional arguments that are empty as if they were not present."
+			#      However, it is rarely the intention, so do not save an empty optional for passthrough.
+			if [[ $valspec == '::' && ! $2 ]]
+			then pcount=1
+			else pcount=$count
+			fi
+
 			IFS=' '; items=( ${arg_passthrough[$1]} ); unset IFS
 			for item in "${items[@]}"; do
 				declare -n target="$item"
-				target+=( "${@:1:$count}" )
+				target+=( "${@:1:$pcount}" )
 				unset -n target
 			done
 		fi
