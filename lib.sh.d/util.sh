@@ -54,6 +54,15 @@ split_into() {
 	read -ra out <<< "$in"
 }
 
+in_array() {
+	local needle="$1"; shift
+	local item
+	for item in "$@"; do
+		if [[ $item == $needle ]]; then return 0; fi
+	done
+	return 1
+}
+
 # "dirname split"
 # $(dn_part $foo)$(bn $foo) == $foo
 dn_slash() {
