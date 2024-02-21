@@ -38,8 +38,9 @@
 #
 parse_args() {
 	eval "$(ltraps)"
-	ltrap "eval '$(shopt -p extglob)'"
+	ltrap "eval '$(shopt -p extglob nullglob)'"
 	shopt -s extglob
+	shopt -u nullglob
 
 	local modes
 	local opts=() optstring
