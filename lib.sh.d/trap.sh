@@ -27,6 +27,21 @@
 #       before exiting.
 #
 
+# WTF moment
+# ---
+# If a variable at the current local scope is unset, it will remain so
+# (appearing as unset) until it is reset in that scope or until the function
+# returns. <...> If the unset acts on a variable at a previous scope, any
+# instance of a variable with that name that had been shadowed will become
+# visible <...>.
+# ---
+# We want the latter behavior, thus this function creates an artificial scope
+# such that any unset executed from traps always acts on "a previous scope".
+# (See commit message for details)
+__dynamic_unset() {
+	unset "$@"
+}
+
 ltraps() {
 	# HACK: forcibly enable globaltraps (see above why)
 	if ! [[ ${__libsh_has_globaltraps+set} ]]; then
@@ -50,7 +65,7 @@ globaltraps() {
 	declare -g __libsh_has_globaltraps=1;
 	declare -g __traps_flag=1;
 	declare -g -a __traps;
-	trap '__rc=$?; __t=""; while [[ ${__traps_flag} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; unset __traps_flag __traps; done; trap - EXIT; exit "$__rc";' EXIT
+	trap '__rc=$?; __t=""; while [[ ${__traps_flag} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; __dynamic_unset __traps_flag __traps; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
 
