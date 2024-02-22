@@ -38,9 +38,8 @@
 #
 parse_args() {
 	eval "$(ltraps)"
-	ltrap "eval '$(shopt -p extglob nullglob)'"
+	ltrap "eval '$(shopt -p extglob)'"
 	shopt -s extglob
-	shopt -u nullglob
 
 	local modes
 	local opts=() optstring
@@ -60,7 +59,7 @@ parse_args() {
 	# pass parsing modes ("+" or "-")
 	if [[ "${spec[getopt]+set}" ]]; then
 		modes="${spec[getopt]}"
-		unset spec[getopt]
+		unset 'spec[getopt]'
 	fi
 
 	# preprocess compound keys ("-a|--arg")
@@ -70,7 +69,7 @@ parse_args() {
 	for key in "${!spec[@]}"; do
 		if [[ $key == *"|"* ]]; then
 			value="${spec["$key"]}"
-			unset spec["$key"]
+			unset "spec[$key]"
 
 			flag="${key##*([^:])}"
 			key="${key%%*(:)}"
@@ -130,7 +129,7 @@ parse_args() {
 			# patch something in to let the next loop start from 1
 			value_items=( - "${value_items[@]}" )
 			# delete the bogus target
-			unset arg_to_target["$key"]
+			unset "arg_to_target[$key]"
 		fi
 
 		# next items are behavior modifiers
