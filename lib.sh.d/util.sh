@@ -63,6 +63,28 @@ in_array() {
 	return 1
 }
 
+array_filter() {
+	declare -n in="$1" out="$2"
+	local arg
+	out=()
+	for arg in "${in[@]}"; do
+		if [[ $arg == $3 ]]; then
+			out+=( "$arg" )
+		fi
+	done
+}
+
+array_filter_out() {
+	declare -n in="$1" out="$2"
+	local arg
+	out=()
+	for arg in "${in[@]}"; do
+		if [[ $arg != $3 ]]; then
+			out+=( "$arg" )
+		fi
+	done
+}
+
 # "dirname split"
 # $(dn_part $foo)$(bn $foo) == $foo
 dn_slash() {
