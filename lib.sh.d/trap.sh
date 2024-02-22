@@ -35,6 +35,7 @@ ltraps() {
 
 	cat <<-"EOF"
 	declare -a __traps;
+	declare __traps_flag=${#FUNCNAME[@]};
 	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - RETURN' RETURN
 	EOF
 }
@@ -47,8 +48,9 @@ globaltraps() {
 
 	cat <<-"EOF"
 	declare -g __libsh_has_globaltraps=1;
+	declare -g __traps_flag=1;
 	declare -g -a __traps;
-	trap '__rc=$?; __t=""; while [[ ${__traps+set} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; unset __traps; done; trap - EXIT; exit "$__rc";' EXIT
+	trap '__rc=$?; __t=""; while [[ ${__traps_flag} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; unset __traps_flag __traps; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
 
