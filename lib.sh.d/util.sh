@@ -227,6 +227,42 @@ var_copy() {
 	echo "$p"
 }
 
+# It is not possible to pass an array via `awk -v ...`.
+# Work around this by generating a snippet for inclusion via `awk -i`.
+#
+# Intended usage: awk -i <(awk_make_array name elements...)
+awk_make_array() {
+	local name="$1"
+	local -a values=( "${@:2}" )
+
+	(( ${#values[@]} )) || return 0
+
+	printf "BEGIN {\n"
+	local i
+	for (( i=0; i < ${#values[@]}; ++i )); do
+		printf "\t%s[%d]=\"%s\"\n" "$name" "$i" "${values[$i]}"
+	done
+	printf "}\n"
+}
+
+# In the same vein, generate a snippet representing an array as a set
+# (i. e. representing elements as keys of an awk (associative) array).
+#
+# Intended usage: awk -i <(awk_make_set name elements...)
+awk_make_set() {
+	local name="$1"
+	local -a values=( "${@:2}" )
+
+	(( ${#values[@]} )) || return 0
+
+	printf "BEGIN {\n"
+	local v
+	for v in "${values[@]}"; do
+		printf "\t%s[\"%s\"]=1\n" "$name" "$v"
+	done
+	printf "}\n"
+}
+
 set_difference_f() {
 	grep -Fvxf "$2" "$1" ||:
 }
