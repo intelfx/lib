@@ -48,7 +48,7 @@ _list_collapse_a() {
 
 	local i first last
 
-	i="${in_array[0]}"; unset in_array[0]
+	i="${in_array[0]}"; unset 'in_array[0]'
 	first=$i
 	last=$i
 	for i in "${in_array[@]}"; do
@@ -117,7 +117,7 @@ list_and() {
 	for k in "${!result[@]}"; do
 		v="${result[$k]}"
 		if (( v != 2 )); then
-			unset result[$k]
+			unset "result[$k]"
 		fi
 	done
 
@@ -137,7 +137,7 @@ list_sub() {
 	done
 
 	for k in "${rhs[@]}"; do
-		unset result[$k]
+		unset "result[$k]"
 	done
 
 	_list_collapse_A result
