@@ -122,6 +122,7 @@ libsh_export_ltraps() {
 	fi
 	export _LIBSH_HAS_TRAP=1
 	export -f \
+		__dynamic_unset \
 		globaltraps \
 		ltraps \
 		ltrap \
