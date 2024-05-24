@@ -131,6 +131,10 @@ function XXXf() {
 	xxxf "$@"
 }
 
+# XXX: this is exported to facilitate trace-like functions in external scripts
+function _libsh_trace() {
+	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "$@"
+}
 function trace() {
 	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	"$@"
@@ -222,6 +226,7 @@ libsh_export_log() {
 		_libsh_printf_var \
 		_libsh_log \
 		_libsh_logf \
+		_libsh_trace \
 		dbg dbgf \
 		log logf \
 		say sayf \
