@@ -87,7 +87,7 @@ parse_args() {
 
 		if [[ $key == -- ]]; then
 			arg_to_target[$key]="$value"
-		elif [[ $key =~ ^(--|-)([a-zA-Z0-9_-]+)(|:|::)$ ]]; then
+		elif [[ $key =~ ^(--|-)([a-zA-Z0-9._-]+)(|:|::)$ ]]; then
 			key_dashes="${BASH_REMATCH[1]}"
 			key_name="${BASH_REMATCH[2]}"
 			key_valspec="${BASH_REMATCH[3]}"
