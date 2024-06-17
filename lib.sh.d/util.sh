@@ -183,6 +183,25 @@ print_array0() {
 }
 printa0() { print_array0 "$@"; }
 
+printfa() {
+	# ad-hoc parser to compute how many format arguments we have
+	local argn=1
+	while (( argn <= $# )); do
+		case "${@:argn:1}" in
+		-v) (( argn += 2 )) ;;
+		-v*) (( argn += 1 )) ;;
+		--) (( argn += 1 )) ;&
+		*) break ;;
+		esac
+	done
+	# print if we have >0 format arguments, OR if FORMAT has no format specifiers
+	# i.e. $(printfa "%s\n") == "", but $(printfa "foo\n") == "foo\n"
+	local fmt="${@:argn:1}"
+	if (( $# > argn )) || [[ "${fmt//%%}" != *%* ]]; then
+		printf "$@"
+	fi
+}
+
 sort_array() {
 	local name="$1"
 	declare -n array="$name"
