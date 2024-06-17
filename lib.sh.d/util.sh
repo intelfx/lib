@@ -174,12 +174,14 @@ print_array() {
 		printf "%s\n" "$@"
 	fi
 }
+printa() { print_array "$@"; }
 
 print_array0() {
 	if (( $# )); then
 		printf "%s\0" "$@"
 	fi
 }
+printa0() { print_array0 "$@"; }
 
 sort_array() {
 	local name="$1"
