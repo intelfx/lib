@@ -140,6 +140,25 @@ function trace() {
 	"$@"
 }
 
+function Trace() {
+	local priority="${_LIBSH_PRIO[trace]}"
+	local prefix="${_LIBSH_PREFIX[$priority]}"
+	local rc=0
+	local PS4=""
+	if [[ $prefix ]]; then
+		PS4+="\\[$prefix\\]"
+	fi
+	PS4+="-> "
+	if [[ $LIBSH_LOG_PREFIX ]]; then
+		PS4+="$LIBSH_LOG_PREFIX: "
+	fi
+
+	set -x
+	"$@" || { rc=$?; } &>/dev/null
+	{ set +x; } &>/dev/null
+	return $rc
+}
+
 function dry_run() {
 	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	if ! (( DRY_RUN )); then
@@ -237,6 +256,7 @@ libsh_export_log() {
 		xxx xxxf \
 		XXX XXXf \
 		trace \
+		Trace \
 		dry_run \
 
 		#check check_e \
