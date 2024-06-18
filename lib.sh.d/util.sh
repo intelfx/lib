@@ -119,6 +119,19 @@ bn() {
 	esac
 }
 
+# extract N-th last component of pathnames
+extract() {
+	local n="$1"
+	shift
+	local i arg
+	for arg; do
+		for (( i=1; i<n; ++i )); do
+			arg="$(dn "$arg")"
+		done
+		bn "$arg"
+	done
+}
+
 joinpath() {
 	local r arg
 	for arg; do
