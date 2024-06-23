@@ -485,6 +485,7 @@ findctl_add_inclusions() {
 }
 
 findctl_run() {
+	{ Trace_suspend; } &>/dev/null
 	declare -n find_args="$1_ARGS"; declare -g -a find_args
 	declare -n find_targets="$1_TARGETS"; declare -g -a find_targets
 	declare -n find_pre_args="$1_PRE_ARGS"; declare -g -a find_pre_args
@@ -531,6 +532,7 @@ findctl_run() {
 	done
 
 	find_cmd+=( "$@" )
+	{ Trace_resume; } &>/dev/null
 
 	"${find_cmd[@]}"
 }
