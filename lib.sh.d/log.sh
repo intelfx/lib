@@ -153,10 +153,36 @@ function Trace() {
 		PS4+="$LIBSH_LOG_PREFIX: "
 	fi
 
+	local _in_trace=1
+	local _in_trace_suspend=0
+	local _trace_old_set _trace_new_set
+	_trace_old_set="$(set +o)"
+
 	set -x
+	{ _trace_new_set="$(set +o)"; } &>/dev/null
 	"$@" || { rc=$?; } &>/dev/null
-	{ set +x; } &>/dev/null
+	{ eval "$_trace_old_set"; } &>/dev/null
 	return $rc
+}
+function Trace_suspend() {
+	if ! [[ ${_in_trace+set} ]]; then
+		return
+	fi
+	if ! (( _in_trace_suspend++ )); then
+		eval "$_trace_old_set"
+	fi
+}
+
+function Trace_resume() {
+	if ! [[ ${_in_trace+set} ]]; then
+		return
+	fi
+	if ! (( _in_trace_suspend > 0 )); then
+		return
+	fi
+	if ! (( --_in_trace_suspend )); then
+		eval "$_trace_new_set"
+	fi
 }
 
 function dry_run() {
