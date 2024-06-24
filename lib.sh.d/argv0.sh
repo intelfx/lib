@@ -12,6 +12,9 @@ if ! [[ ${LIB_ARGV0+set} ]]; then
 		fi
 	done
 
+	# Precompute a string with all arguments for logging/debugging purposes
+	LIB_ARGV="$LIB_ARGV0${*:+" ${*@Q}"}"
+
 	# NOTE: if $LIB_ARGV0 needs to be inherited across subprocesses,
 	# the caller must export it manually.
 fi
