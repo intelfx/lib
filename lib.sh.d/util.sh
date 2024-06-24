@@ -416,6 +416,7 @@ cat_config() {
 }
 
 maybe_find() {
+	{ Trace_suspend; } &>/dev/null
 	local has_paths=0
 
 	#
@@ -437,8 +438,14 @@ maybe_find() {
 			has_paths=1 ;;
 		esac
 	done
-	if ! (( has_paths )); then return; fi
-	find "$@"
+
+	local -a find_cmd=( true )
+	if (( has_paths )); then
+		find_cmd=( find "$@" )
+	fi
+
+	{ Trace_resume; } &>/dev/null
+	"${find_cmd[@]}"
 }
 
 findctl_init() {
