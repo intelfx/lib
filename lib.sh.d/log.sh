@@ -172,7 +172,6 @@ function Trace_suspend() {
 		eval "$_trace_old_set"
 	fi
 }
-
 function Trace_resume() {
 	if ! [[ ${_in_trace+set} ]]; then
 		return
