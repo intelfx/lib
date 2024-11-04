@@ -4,7 +4,7 @@ set -eo pipefail
 shopt -s lastpipe
 shopt -s extglob
 
-__libsh="$(realpath -qe "${BASH_SOURCE}").d"
+__libsh="$(realpath "${BASH_SOURCE}").d"
 if ! [[ -d "$__libsh" ]]; then
 	echo "lib.sh: lib.sh.d does not exist!" >&2
 	return 1
