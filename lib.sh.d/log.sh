@@ -171,13 +171,14 @@ function Trace() {
 	local _in_trace=1
 	local _in_trace_suspend=0
 	local _trace_old_set _trace_new_set
-	_trace_old_set="$(set +o)"
-
+	# `var=$(set +o)` creates a subshell and clears `set -e`, use read instead
+	# `read` returns nonzero on EOF, which will always happen due to `-d ''`
+	set +o | IFS= read -r -d '' _trace_old_set || true
+	trap '{ rc=$?; eval "$_trace_old_set"; } &>/dev/null; trap - ERR; return $rc' ERR
 	set -x
-	{ _trace_new_set="$(set +o)"; } &>/dev/null
-	"$@" || { rc=$?; } &>/dev/null
-	{ eval "$_trace_old_set"; } &>/dev/null
-	return $rc
+	{ set +o | IFS= read -r -d '' _trace_new_set || true; } &>/dev/null
+	"$@"
+	{ rc=$?; eval "$_trace_old_set"; } &>/dev/null; trap - ERR; return $rc
 }
 function Trace_suspend() {
 	if ! [[ ${_in_trace+set} ]]; then
@@ -187,7 +188,6 @@ function Trace_suspend() {
 		eval "$_trace_old_set"
 	fi
 }
-
 function Trace_resume() {
 	if ! [[ ${_in_trace+set} ]]; then
 		return
