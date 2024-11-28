@@ -257,6 +257,8 @@ function usagef() {
 }
 
 function loud() {
+	declare -g _LIBSH_LAST_LOUD
+
 	local prio="${_LIBSH_PRIO[loud]}"
 	local args=( "$@" )
 	local len=0
@@ -274,6 +276,16 @@ function loud() {
 		local pad_r="$(repeat ' ' "$(( (len - ${#a} + 1) / 2 ))")"  # rounded up
 		_libsh_log "$prio" "" "" "==== ${pad_l}${a}${pad_r} ===="
 	done
+	_libsh_log "$prio" "" "" "$header"
+
+	_LIBSH_LAST_LOUD="$(( 5 + len + 5 ))"
+}
+
+function loudsep() {
+	declare -g _LIBSH_LAST_LOUD
+
+	local prio="${_LIBSH_PRIO[loud]}"
+	local header="$(repeat '=' "$_LIBSH_LAST_LOUD")"
 	_libsh_log "$prio" "" "" "$header"
 }
 
