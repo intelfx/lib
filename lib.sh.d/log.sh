@@ -148,9 +148,15 @@ function XXXf() {
 
 # XXX: this is exported to facilitate trace-like functions in external scripts
 function _libsh_trace() {
+	if [[ $LIBSH_TRACE_NO_PREFIX ]]; then
+		local LIBSH_LOG_PREFIX=""
+	fi
 	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "$@"
 }
 function trace() {
+	if [[ $LIBSH_TRACE_NO_PREFIX ]]; then
+		local LIBSH_LOG_PREFIX=""
+	fi
 	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	"$@"
 }
@@ -164,7 +170,7 @@ function Trace() {
 		PS4+="\\[$prefix\\]"
 	fi
 	PS4+="-> "
-	if [[ $LIBSH_LOG_PREFIX ]]; then
+	if [[ ! $LIBSH_TRACE_NO_PREFIX ]] && [[ $LIBSH_LOG_PREFIX ]]; then
 		PS4+="$LIBSH_LOG_PREFIX: "
 	fi
 
