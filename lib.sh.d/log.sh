@@ -71,10 +71,20 @@ function _libsh_log() {
 	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
 }
 function _libsh_logf() {
-	local priority="$1" marker="$2" prefix="$3" text
+	local priority="$1" marker="$2" prefix="$3" text line
 	shift 3
 	_libsh_printf_var text "$@"
-	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
+
+	# if a `logf` family function is used to print several sets of args,
+	# e.g. `logf "%s\n" foo bar baz`, log each line separately.
+	if [[ $text == *$'\n'* ]]; then
+		# `<<<$text` appends a newline of its own, so chop the existing one.
+		readarray -t text <<<"${text%$'\n'}"
+	fi
+
+	for line in "${text[@]}"; do
+		echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$line" >&2
+	done
 }
 
 function dbg() {
