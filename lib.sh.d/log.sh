@@ -38,15 +38,30 @@ function _libsh_printf_var() {
 		return
 	fi
 	local args=( "$@" )
-	local i c=0
+	declare -A args_spec
+	local i c=0 cnt
+
+	# iterate over conversion specifiers
+	# remember which are %v/%V and count them
 	for (( i=0; i < ${#fmt} - 1; ++i )); do
 		case "${fmt:i:2}" in
 		%%) (( ++i )) ;;
-		%v) args[c]="${!args[c]}"; (( ++c, ++i )) ;;
-		%V) args[c]="$(declare -p "${args[c]}")"; args[c]="${args[c]#declare +(-+([^ ]) )}"; (( ++c, ++i )) ;;
+		%v) args_spec[$c]='%v'; (( ++c, ++i )) ;;
+		%V) args_spec[$c]='%V'; (( ++c, ++i )) ;;
 		%?) (( ++c, ++i )) ;;
 		esac
 	done
+	cnt="$c"
+
+	# iterate over arguments (there might be more arguments than specifiers)
+	# mangle those corresponding to %v/%V
+	for (( c=0; c < ${#args[@]}; ++c )); do
+		case "${args_spec[$((c % cnt))]}" in
+		%v) args[c]="${!args[c]}"; ;;
+		%V) args[c]="$(declare -p "${args[c]}")"; args[c]="${args[c]#declare +(-+([^ ]) )}"; ;;
+		esac
+	done
+
 	printf -v "$var" -- "${fmt//%[Vv]/%s}" "${args[@]}"
 
 }
