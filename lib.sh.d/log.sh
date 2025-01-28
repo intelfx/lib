@@ -217,7 +217,11 @@ function Trace_resume() {
 }
 
 function dry_run() {
-	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
+	if [[ $1 == "-q" || $1 == "--quiet" ]]; then
+		shift
+	else
+		_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
+	fi
 	if ! (( DRY_RUN )); then
 		"$@"
 	fi
