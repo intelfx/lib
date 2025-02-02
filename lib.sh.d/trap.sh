@@ -26,6 +26,14 @@
 #       If globaltraps is active, it will run all currently active scopes
 #       before exiting.
 #
+# Unfortunately, EXIT traps do not have access to the local scope anymore
+# (which seems to be a bug in the first place, however convenient it was),
+# so we cannot "unwind" organically by accessing $__traps and unsetting
+# it repeatedly until it does not exist anymore.
+#
+# Instead, do things the ugly way: maintain two stacks simultaneously and
+# chop off the top of the global stack on RETURN.
+#
 
 # WTF moment
 # ---
@@ -35,53 +43,66 @@
 # instance of a variable with that name that had been shadowed will become
 # visible <...>.
 # ---
-# We want the latter behavior, thus this function creates an artificial scope
-# such that any unset executed from traps always acts on "a previous scope".
+# We don't use this anymore, however, preserve this function for posterity:
+# this function creates an artificial scope such that any unset that is
+# performed on behalf of the caller always acts on "a previous scope".
 # (See commit message for details)
 __dynamic_unset() {
 	unset "$@"
 }
 
 ltraps() {
-	# HACK: forcibly enable globaltraps (see above why)
-	if ! [[ ${__libsh_has_globaltraps+set} ]]; then
-		globaltraps
+	# guard against repeated setup
+	if [[ ${__traps_flag+set} ]] && (( __traps_flag == ${#FUNCNAME[@]}-1 )); then
+		return
 	fi
+	# enable global traps to handle EXIT
+	globaltraps
 
 	cat <<-"EOF"
 	declare -a __traps;
 	declare __traps_flag=${#FUNCNAME[@]};
-	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; trap - RETURN' RETURN
+	declare __gtraps_mark=${#__gtraps[@]};
+	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; __gtraps=("${__gtraps[@]:"-$__gtraps_mark"}"); trap - RETURN' RETURN
 	EOF
 }
 
 globaltraps() {
 	# guard against repeated setup
-	if [[ ${__libsh_has_globaltraps+set} ]]; then
+	if [[ ${__gtraps+set} ]]; then
 		return
+	fi
+	# we add a fake local scope for other code to work consistently,
+	# which we cannot do if there is already a non-fake one
+	if [[ ${__traps+set} ]]; then
+		die "globaltraps: localtraps activated before globaltraps"
 	fi
 
 	cat <<-"EOF"
-	declare -g __libsh_has_globaltraps=1;
-	declare -g __traps_flag=1;
+	declare -g __traps_flag=0;
+	declare -g __gtraps_mark=0;
 	declare -g -a __traps;
-	trap '__rc=$?; __t=""; while [[ ${__traps_flag} ]]; do for __t in "${__traps[@]}"; do eval "$__t" || true; done; __dynamic_unset __traps_flag __traps; done; trap - EXIT; exit "$__rc";' EXIT
+	declare -g -a __gtraps;
+	trap '__rc=$?; __t=""; for __t in "${__gtraps[@]}"; do eval "$__t" || true; done; trap - EXIT; exit "$__rc";' EXIT
 	EOF
 }
 
 ltrap() {
 	# prepend
 	__traps=( "$1" "${__traps[@]}" )
+	# add the same trap to the "shadow" stack for EXIT (see above)
+	__gtraps=( "$1" "${__gtraps[@]}" )
 }
 
 luntrap() {
 	# remove first item
 	__traps=( "${__traps[@]:1}" )
+	__gtraps=( "${__gtraps[@]:1}" )
 }
 
 lruntrap() {
 	local __t="${__traps[0]}"
-	__traps=( "${__traps[@]:1}" )
+	luntrap
 	eval "$__t" || true
 }
 
@@ -91,7 +112,7 @@ ltrap_mark() {
 }
 
 # $1: either how many traps to run (>0) or a mark (<=0)
-#     NOTE: `$1 == 0`` is a mark, meaning "run all traps"
+#     NOTE: `$1 == 0` is a mark, meaning "run all traps"
 ltrap_unwind() {
 	local __nr="$1"
 	if (( __nr <= 0 )); then
@@ -114,6 +135,7 @@ ltrap_unwind() {
 		eval "$__t" || true
 	done
 	__traps=( "${__traps[@]:$__nr}" )
+	__gtraps=( "${__gtraps[@]:$__nr}" )
 }
 
 libsh_export_ltraps() {
