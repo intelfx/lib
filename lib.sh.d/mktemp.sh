@@ -4,6 +4,13 @@ mktemp1() {
 	command mktemp --tmpdir "${0##*/}${1:+"-$1"}.XXXXXXXXXX" "${@:2}"
 }
 
+mktemp_trap() {
+	local tmpfile
+	tmpfile="$(mktemp1 "$@")" || return
+	ltrap "rm -f ${tmpfile@Q}"
+	printf "%s\n" "$tmpfile"
+}
+
 libmktemp() {
 	if ! [[ $_HAVE_CLEANUP_FILES ]]; then
 		die "libmktemp() called before libmktemp_setup()"
