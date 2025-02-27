@@ -1,11 +1,15 @@
 #!/hint/bash
 
+mktemp1() {
+	command mktemp --tmpdir "${0##*/}${1:+"-$1"}.XXXXXXXXXX" "${@:2}"
+}
+
 libmktemp() {
 	if ! [[ $_HAVE_CLEANUP_FILES ]]; then
 		die "libmktemp() called before libmktemp_setup()"
 	fi
 
-	_CLEANUP_FILES+="$(command mktemp --tmpdir "${0##*/}${1:+"-$1"}.XXXXXXXXXX" "${@:2}")"
+	_CLEANUP_FILES+="$(mktemp1 "$@")"
 	echo "${_CLEANUP_FILES[-1]}"
 }
 
