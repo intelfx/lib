@@ -76,13 +76,13 @@ array_filter() {
 
 array_filter_out() {
 	declare -n in="$1" out="$2"
-	local arg
-	out=()
+	local arg tmp=()
 	for arg in "${in[@]}"; do
 		if [[ $arg != $3 ]]; then
-			out+=( "$arg" )
+			tmp+=( "$arg" )
 		fi
 	done
+	out=( "${tmp[@]}" )
 }
 
 # "dirname split"
