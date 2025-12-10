@@ -88,71 +88,89 @@ function _libsh_logf() {
 }
 
 function dbg() {
+	{ local -; set +x; } &>/dev/null
 	if (( LIBSH_DEBUG )); then
 		_libsh_log "${_LIBSH_PRIO[dbg]}" "DBG:" "$LIBSH_LOG_PREFIX" "$*"
 	fi
 }
 function dbgf() {
+	{ local -; set +x; } &>/dev/null
 	if (( LIBSH_DEBUG )); then
 		_libsh_logf "${_LIBSH_PRIO[dbg]}" "DBG:" "$LIBSH_LOG_PREFIX" "$@"
 	fi
 }
 
 function log() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$*"
 }
 function logf() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[log]}" "::" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function say() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$*"
 }
 function sayf() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[say]}" "" "" "$@"
 }
 
 function warn() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function warnf() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[warn]}" "W:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function warning() {
+	{ local -; set +x; } &>/dev/null
 	warn "$@"
 }
 function warningf() {
+	{ local -; set +x; } &>/dev/null
 	warnf "$@"
 }
 
 function err() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function errf() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[err]}" "E:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function die() {
+	{ local -; set +x; } &>/dev/null
 	err "$@"
 	exit 1
 }
 function dief() {
+	{ local -; set +x; } &>/dev/null
 	errf "$@"
 	exit 1
 }
 
 function xxx() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$*"
 }
 function xxxf() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[xxx]}" "XXX:" "$LIBSH_LOG_PREFIX" "$@"
 }
 
 function XXX() {
+	{ local -; set +x; } &>/dev/null
 	xxx "$@"
 }
 function XXXf() {
+	{ local -; set +x; } &>/dev/null
 	xxxf "$@"
 }
 
@@ -164,6 +182,7 @@ function _libsh_trace() {
 	_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "$@"
 }
 function trace() {
+	{ local -; set +x; } &>/dev/null
 	if [[ $LIBSH_TRACE_NO_PREFIX ]]; then
 		local LIBSH_LOG_PREFIX=""
 	fi
@@ -172,6 +191,8 @@ function trace() {
 }
 
 function Trace() {
+	{ local -; set +x; } &>/dev/null
+	if [[ ${_in_trace+set} ]]; then return; fi
 	local priority="${_LIBSH_PRIO[trace]}"
 	local prefix="${_LIBSH_PREFIX[$priority]}"
 	local rc=0
@@ -217,17 +238,20 @@ function Trace_resume() {
 }
 
 function dry_run() {
+	{ local -; set +x; } &>/dev/null
 	if [[ $1 == "-q" || $1 == "--quiet" ]]; then
 		shift
 	else
 		_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	fi
 	if ! (( DRY_RUN )); then
+		{ if [[ ${_in_trace+set} ]]; then set -x; fi; } &>/dev/null
 		"$@"
 	fi
 }
 
 function check() {
+	{ local -; set +x; } &>/dev/null
 	local stmt="$1"
 	shift
 	if ! eval "$stmt"; then
@@ -236,6 +260,7 @@ function check() {
 }
 
 function check_e() {
+	{ local -; set +x; } &>/dev/null
 	local expr="$1"
 	shift
 	if ! eval "[[ $expr ]]"; then
@@ -244,6 +269,7 @@ function check_e() {
 }
 
 function assert() {
+	{ local -; set +x; } &>/dev/null
 	local stmt="$1"
 	shift
 	if ! eval "$stmt"; then
@@ -252,6 +278,7 @@ function assert() {
 }
 
 function assert_e() {
+	{ local -; set +x; } &>/dev/null
 	local expr="$1"
 	shift
 	if ! eval "[[ $expr ]]"; then
@@ -260,6 +287,7 @@ function assert_e() {
 }
 
 function usage() {
+	{ local -; set +x; } &>/dev/null
 	if (( $# )); then
 		if [[ "$*" ]]; then
 			_libsh_log "${_LIBSH_PRIO[err]}" "" "$LIBSH_LOG_PREFIX" "$*"
@@ -270,6 +298,7 @@ function usage() {
 	exit 1
 }
 function usagef() {
+	{ local -; set +x; } &>/dev/null
 	_libsh_log "${_LIBSH_PRIO[err]}" "" "$LIBSH_LOG_PREFIX" "$(printf -- "$@")"
 	echo >&2
 	_usage >&2
@@ -277,6 +306,7 @@ function usagef() {
 }
 
 function loud() {
+	{ local -; set +x; } &>/dev/null
 	declare -g _LIBSH_LAST_LOUD
 
 	local prio="${_LIBSH_PRIO[loud]}"
@@ -302,6 +332,7 @@ function loud() {
 }
 
 function loudsep() {
+	{ local -; set +x; } &>/dev/null
 	declare -g _LIBSH_LAST_LOUD
 
 	local prio="${_LIBSH_PRIO[loud]}"
