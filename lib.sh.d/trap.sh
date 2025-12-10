@@ -63,7 +63,7 @@ ltraps() {
 	declare -a __traps;
 	declare __traps_flag=${#FUNCNAME[@]};
 	declare __gtraps_mark=${#__gtraps[@]};
-	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; __gtraps=("${__gtraps[@]:"-$__gtraps_mark"}"); trap - RETURN' RETURN
+	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; __gtraps=("${__gtraps[@]:${#__gtraps[@]}-$__gtraps_mark}"); trap - RETURN' RETURN
 	EOF
 }
 
