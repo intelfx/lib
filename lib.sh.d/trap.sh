@@ -63,7 +63,7 @@ ltraps() {
 	declare -a __traps;
 	declare __traps_flag=${#FUNCNAME[@]};
 	declare __gtraps_mark=${#__gtraps[@]};
-	trap 'local __t; for __t in "${__traps[@]}"; do eval "$__t" || true; done; __gtraps=("${__gtraps[@]:${#__gtraps[@]}-$__gtraps_mark}"); trap - RETURN' RETURN
+	trap '{ local __t; } &>/dev/null; for __t in "${__traps[@]}"; do eval "$__t" || true; done; { __gtraps=("${__gtraps[@]:${#__gtraps[@]}-$__gtraps_mark}"); trap - RETURN; } &>/dev/null' RETURN
 	EOF
 }
 
@@ -83,7 +83,7 @@ globaltraps() {
 	declare -g __gtraps_mark=0;
 	declare -g -a __traps;
 	declare -g -a __gtraps;
-	trap '__rc=$?; __t=""; for __t in "${__gtraps[@]}"; do eval "$__t" || true; done; trap - EXIT; exit "$__rc";' EXIT
+	trap '{ __rc=$?; __t=""; } &>/dev/null; for __t in "${__gtraps[@]}"; do eval "$__t" || true; done; { trap - EXIT; exit "$__rc"; } &>/dev/null' EXIT
 	EOF
 }
 
