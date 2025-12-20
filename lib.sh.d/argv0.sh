@@ -12,6 +12,9 @@ if ! [[ ${LIB_ARGV0+set} ]]; then
 		fi
 	done
 
+	# Also provide the script _name_ for convenience.
+	LIB_NAME="${0##*/}"
+
 	# Precompute a string with all arguments for logging/debugging purposes
 	LIB_ARGV="$LIB_ARGV0${*:+" ${*@Q}"}"
 
