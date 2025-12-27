@@ -53,6 +53,14 @@ print_or() {
     text="$(cat)" && [[ "$text" ]] && printf "%s" "$text" || printf "%s" "$*"
 }
 
+ifelse() {
+	local cond="$1"
+	if (( $# > 2 )); then
+		shift
+	fi
+	[[ "$cond" ]] && printf "%s" "$1" || printf "%s" "$2"
+}
+
 split_into() {
 	declare -n out="$1"
 	local IFS="$2" in="$3"
