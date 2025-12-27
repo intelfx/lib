@@ -48,6 +48,11 @@ join() {
 	echo "$arg0${*/#/$sep}"
 }
 
+print_or() {
+    local text
+    text="$(cat)" && [[ "$text" ]] && printf "%s" "$text" || printf "%s" "$*"
+}
+
 split_into() {
 	declare -n out="$1"
 	local IFS="$2" in="$3"
