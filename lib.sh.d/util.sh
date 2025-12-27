@@ -424,6 +424,18 @@ stderr_is_stdout() {
 	fi
 }
 
+anykey() {
+	local resp
+	local -a args
+	while (( $# )); do
+		case "$1" in
+		-p) args+=( "$1" "$2"$'\n' ); shift 2 ;;
+		*)  args+=( "$1" ); shift ;;
+		esac
+	done
+	read -r -s -n1 "${args[@]}" resp ||:
+}
+
 cat_config() {
 	sed -r 's/[[:space:]]*(#.*)?$//g; /^$/d' "$@"
 }
