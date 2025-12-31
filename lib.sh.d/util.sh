@@ -48,6 +48,19 @@ join() {
 	echo "$arg0${*/#/$sep}"
 }
 
+print_or() {
+    local text
+    text="$(cat)" && [[ "$text" ]] && printf "%s" "$text" || printf "%s" "$*"
+}
+
+ifelse() {
+	local cond="$1"
+	if (( $# > 2 )); then
+		shift
+	fi
+	[[ "$cond" ]] && printf "%s" "$1" || printf "%s" "$2"
+}
+
 split_into() {
 	declare -n out="$1"
 	local IFS="$2" in="$3"
@@ -409,6 +422,18 @@ stderr_is_stdout() {
 		# otherwise assume stdout != stderr
 		return 1
 	fi
+}
+
+anykey() {
+	local resp
+	local -a args
+	while (( $# )); do
+		case "$1" in
+		-p) args+=( "$1" "$2"$'\n' ); shift 2 ;;
+		*)  args+=( "$1" ); shift ;;
+		esac
+	done
+	read -r -s -n1 "${args[@]}" resp ||:
 }
 
 cat_config() {
