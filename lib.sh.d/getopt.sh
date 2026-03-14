@@ -1,5 +1,8 @@
 #!/hint/bash
 
+# shellcheck is too dumb to realize this is set from outside
+shopt -s lastpipe
+
 # $1: name of an associative array with argument definitions (see below)
 # $2...: arguments to parse
 #
