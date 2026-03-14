@@ -117,8 +117,8 @@ parse_args() {
 	for key in "${!arg_to_target[@]}"; do
 		value="${arg_to_target["$key"]}"
 
-		# split on whitespace
-		IFS=' '; value_items=( $value ); unset IFS
+		# split on whitespace, preserving quoting
+		xargs <<<"$value" printf "%s\n" | readarray -t value_items
 
 		# first item is the actual target variable name,
 		# unless it has a "=" (to support bare "pass=")
