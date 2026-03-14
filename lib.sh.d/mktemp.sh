@@ -45,6 +45,9 @@ mktemp1() {
 # 	printf "%s\n" "$tmpfile"
 # }
 
+# More ergonomic mktemp(1) with automatic cleanup.
+# Must be invoked after libmktemp_setup() which configures the cleanup handler.
+# See mktemp1() for behavior details.
 libmktemp() {
 	if ! [[ $_HAVE_CLEANUP_FILES ]]; then
 		die "libmktemp() called before libmktemp_setup()"
