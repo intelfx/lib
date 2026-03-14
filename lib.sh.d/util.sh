@@ -240,6 +240,9 @@ sort_array() {
 	readarray -t -d '' "$name" < <(printf '%s\0' "${array[@]}" | sort -z "$@")
 }
 
+# $1: name of the map variable
+# $2: value to assign to each key
+# $3+: keys to assign the value to
 makeset() {
 	local name="$1"
 	local value="$2"
@@ -252,10 +255,14 @@ makeset() {
 	done
 }
 
+# N: number of arguments
+# $1..$(N-2): arguments to readarray
+# $(N-1): name of the map variable
+# $(N): value to assign to each key
 readset() {
 	local args=( "${@:1:$#-2}" )
-	local name="${@:($#-1):1}"
-	local value="${@:($#):1}"
+	local name="${*:($#-1):1}"
+	local value="${*:($#):1}"
 
 	declare -a array
 	readarray "${args[@]}" array
