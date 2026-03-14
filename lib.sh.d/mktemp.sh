@@ -1,7 +1,40 @@
 #!/hint/bash
 
+# More ergonomic mktemp(1).
+# - implies `--tmpdir`
+# - any flags are passed to mktemp(1)
+# - the default tmpfile pattern is based on the current script name
+# - any argument that contains three or more Xs is used as a replacement pattern
+# - any argument that starts with a dot is appended to the default pattern (as an extension)
+# - any other argument is inserted into the default pattern after the script name (as a disambiguator)
 mktemp1() {
-	command mktemp --tmpdir "${0##*/}${1:+"-$1"}.XXXXXXXXXX" "${@:2}"
+	local -a opts
+	local prefix suffix pattern
+	local arg
+	for arg; do
+		case "$arg" in
+		-*)
+			opts+=( "$arg" )
+			;;
+		.*)
+			[[ ! "$suffix" ]] || die "mktemp1(${*@Q}): invalid arguments: duplicate suffix"
+			suffix="${arg#*.}"
+			;;
+		*XXX*)
+			[[ ! "$pattern" ]] || die "mktemp1(${*@Q}): invalid arguments: duplicate pattern"
+			[[ ! "$prefix" && ! "$suffix" ]] || die "mktemp1(${*@Q}): invalid arguments: pattern must not be combined with prefix/suffix"
+			pattern="$arg"
+			;;
+		*)
+			[[ ! "$prefix" ]] || die "mktemp1(${*@Q}): invalid arguments: duplicate prefix"
+			prefix="$arg"
+			;;
+		esac
+	done
+	if ! [[ $pattern ]]; then
+		pattern="${LIB_NAME}${prefix:+"-$prefix"}.XXXXXXXXXX${suffix:+".$suffix"}"
+	fi
+	command mktemp --tmpdir "${opts[@]}" "$pattern"
 }
 
 # XXX: do not use: this is normally used in a substitution, but traps do not survive subshells
