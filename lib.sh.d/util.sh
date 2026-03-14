@@ -255,6 +255,39 @@ makeset() {
 	done
 }
 
+# $1: name of the map variable
+# $2: separator to use to parse key-value pairs
+# $3+: key-value pairs to assign to the map
+makemap() {
+	local name="$1"
+	local separator="$2"
+	declare -n map="$name"
+	shift 2
+
+	local item IFS
+	for item in "$@"; do
+		if [[ $separator ]]; then
+			IFS="$separator" read -r key value <<< "$item"
+		else
+			read -r key value <<< "$item"
+		fi
+		map["$key"]="$value"
+	done
+}
+
+# $1: name of the map variable
+# ($3, $4)+: key and value pairs to assign to the map
+makemap2() {
+	local name="$1"
+	declare -n map="$name"
+	shift 1
+
+	while (( $# )); do
+		map["$1"]="$2"
+		shift 2
+	done
+}
+
 # N: number of arguments
 # $1..$(N-2): arguments to readarray
 # $(N-1): name of the map variable
@@ -267,6 +300,33 @@ readset() {
 	declare -a array
 	readarray "${args[@]}" array
 	makeset "$name" "$value" "${array[@]}"
+}
+
+# N: number of arguments
+# $1..$(N-2): arguments to readarray
+# $(N-1): name of the map variable
+# $(N): separator to use to parse key-value pairs
+# If separator is empty, use default word-splitting behavior (IFS= not set).
+readmap() {
+	local args=( "${@:1:$#-2}" )
+	local name="${*:($#-1):1}"
+	local sep="${*:($#):1}"
+
+	declare -a array
+	readarray "${args[@]}" a array
+	makemap "$name" "$sep" "${array[@]}"
+}
+
+# N: number of arguments
+# $1..$(N-1): arguments to readarray
+# $(N): name of the map variable
+readmap2() {
+	local args=( "${@:1:$#-1}" )
+	local name="${*:($#):1}"
+
+	declare -A array
+	readarray "${args[@]}" array
+	makemap2 "$name" "${array[@]}"
 }
 
 readarray_append() {
