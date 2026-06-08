@@ -180,6 +180,16 @@ parse_args() {
 				err "parse_args: unexpected positional arguments"
 				return 1
 			fi
+
+			# save (passthrough) the positional arguments
+			if [[ ${arg_passthrough[$1]+set} ]]; then
+				read -ra items <<<"${arg_passthrough[$1]}"
+				for item in "${items[@]}"; do
+					declare -n target="$item"
+					target+=( "$@" )
+					unset -n target
+				done
+			fi
 			return 0
 		fi
 
