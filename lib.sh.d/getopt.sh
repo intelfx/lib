@@ -205,7 +205,7 @@ parse_args() {
 			else pcount=$count
 			fi
 
-			IFS=' '; items=( ${arg_passthrough[$1]} ); unset IFS
+			read -ra items <<<"${arg_passthrough[$1]}"
 			for item in "${items[@]}"; do
 				declare -n target="$item"
 				target+=( "${@:1:$pcount}" )
