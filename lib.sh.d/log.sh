@@ -68,6 +68,16 @@ function _libsh_printf_var() {
 
 function _libsh_log() {
 	local priority="$1" marker="$2" prefix="$3" text="$4"
+	if [[ $text == *$'\n'* ]]; then
+		# If message text contains embedded newlines, indent each subsequent line
+		# to the length of the prefix string.
+		local _prefix="${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }"
+		local _prefix_len="${#_prefix}"
+		printf -v _indent '%*s' "$_prefix_len" ''
+		text="${text//$'\n'/$'\n'"$_indent"}"
+		echo "${_prefix}${text}" >&2
+		return
+	fi
 	echo "${_LIBSH_PREFIX[$priority]}${marker:+$marker }${prefix:+$prefix: }$text" >&2
 }
 function _libsh_logf() {
