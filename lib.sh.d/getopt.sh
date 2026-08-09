@@ -337,7 +337,7 @@ function get_flag() {
 		--) shift; break;;
 		-[a-zA-Z0-9]) short+=( "$1" ); shift;;
 		--*) long+=( "$1" ); shift;;
-		*) die "get_arg: unexpected form \"$1\""
+		*) die "get_flag: unexpected form \"$1\""
 		esac
 	done
 
