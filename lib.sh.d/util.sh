@@ -416,11 +416,15 @@ set_difference_A() {
 
 set_intersection_A() {
 	declare -n src1="$1" src2="$2" dest="$3"
+	local k tmp=()
 
 	{ grep -Fxf \
-		<(print_array "${src1[@]}") \
-		<(print_array "${src2[@]}") \
-	||:; } | readarray -t dest
+		<(print_array "${!src1[@]}") \
+		<(print_array "${!src2[@]}") \
+	||:; } | readarray -t tmp
+	for k in "${tmp[@]}"; do
+		dest["$k"]=1
+	done
 }
 
 all_parents() {
