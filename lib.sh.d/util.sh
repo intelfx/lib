@@ -99,13 +99,13 @@ array_filter_out() {
 }
 
 # "dirname split"
-# $(dn_part $foo)$(bn $foo) == $foo
+# $(dn_slash $foo)$(bn $foo) == $foo
 dn_slash() {
 	local dn="${1%/*}"
 	case "$dn" in
 	"$1") echo   ;;  # $1 contains no slashes
 	"")   echo / ;;  # $1 contains a single slash in the starting position
-	"${1%/}") dn_part "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
+	"${1%/}") dn_slash "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
 	*)    echo "$dn/" ;;
 	esac
 }
@@ -126,7 +126,7 @@ bn() {
 	local basename="${1##*/}"
 	case "$basename" in
 	"$1") echo "$1" ;;  # $1 contains no slashes
-	"${1%/}") echo / ;;  # $1 is a single slash (or contains no slashes)
+	"${1%/}") echo / ;;  # $1 is a single slash (or contains no slashes, which is handled above)
 	"")   bn "${1%%/}" ;;  # $1 ends with slashes, strip them and retry
 	*)    echo "$basename" ;;
 	esac
@@ -160,7 +160,7 @@ joinpath() {
 }
 
 scriptdir() {
-	echo "$(dn "$(realpath -qe "${BASH_SOURCE[1]}")")"
+	dn "$(realpath -qe "${BASH_SOURCE[1]}")"
 }
 
 inplace() {
@@ -222,7 +222,7 @@ printfa() {
 	done
 	# print if we have >0 format arguments, OR if FORMAT has no format specifiers
 	# i.e. $(printfa "%s\n") == "", but $(printfa "foo\n") == "foo\n"
-	local fmt="${@:argn:1}"
+	local fmt="${*:argn:1}"
 	if (( $# > argn )) || [[ "${fmt//%%}" != *%* ]]; then
 		printf "$@"
 	fi
@@ -264,7 +264,7 @@ makemap() {
 	declare -n map="$name"
 	shift 2
 
-	local item IFS
+	local item key value IFS
 	for item in "$@"; do
 		if [[ $separator ]]; then
 			IFS="$separator" read -r key value <<< "$item"
@@ -330,7 +330,7 @@ readmap2() {
 }
 
 readarray_append() {
-	declare -n target="${@: -1}"
+	declare -n target="${*: -1}"
 	readarray -O "${#target[@]}" "$@"
 }
 
@@ -492,7 +492,7 @@ stderr_is_stdout() {
 }
 
 anykey() {
-	local resp
+	local _
 	local -a args
 	while (( $# )); do
 		case "$1" in
@@ -500,7 +500,7 @@ anykey() {
 		*)  args+=( "$1" ); shift ;;
 		esac
 	done
-	read -r -s -n1 "${args[@]}" resp ||:
+	read -r -s -n1 "${args[@]}" _ ||:
 }
 
 cat_config() {
