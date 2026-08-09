@@ -307,7 +307,7 @@ readmap() {
 	local sep="${*:($#):1}"
 
 	declare -a array
-	readarray "${args[@]}" a array
+	readarray "${args[@]}" array
 	makemap "$name" "$sep" "${array[@]}"
 }
 
@@ -318,7 +318,7 @@ readmap2() {
 	local args=( "${@:1:$#-1}" )
 	local name="${*:($#):1}"
 
-	declare -A array
+	declare -a array
 	readarray "${args[@]}" array
 	makemap2 "$name" "${array[@]}"
 }
