@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/hint/bash
 
 regex_unwrap() {
 	local arg="$1"

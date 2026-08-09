@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/hint/bash
 
 #
 # ref. https://unix.stackexchange.com/a/187256/21885

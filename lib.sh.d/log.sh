@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/hint/bash
 
 # log message prefixes by priority
 declare -A _LIBSH_PREFIX

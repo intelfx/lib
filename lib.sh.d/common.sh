@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/hint/bash
 
 BASH_BUILTINS_LOADABLE=(
 	sleep

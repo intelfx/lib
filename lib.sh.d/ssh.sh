@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/hint/bash
 
 # in: $host: [user@]host[:port]
 # out: $addr, $user, $port
