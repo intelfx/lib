@@ -353,7 +353,6 @@ function get_flag() {
 	for f in "${long[@]}"; do
 		if (( $# >= 1 )) && [[ $1 == $f ]]; then
 			key="$f"
-			value="$2"
 			shift_nr=1
 			return 0
 		fi
