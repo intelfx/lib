@@ -169,15 +169,10 @@ scriptdir() {
 
 inplace() {
 	eval "$(ltraps)"
-	_inplace_cleanup() {
-		if [[ -e $out ]]; then
-			rm -f "$out"
-		fi
-	}
-	ltrap _inplace_cleanup
-	local in="${@: -1}"
-	local out="$(mktemp)"
-	set -- "${@:1:$#}"
+	local in="${*: -1}" out
+	out="$(mktemp)"
+	ltrap "rm -f ${out@Q}"
+	set -- "${@:1:$#-1}"
 
 	"$@" <"$in" >"$out"
 	cat "$out" >"$in"
@@ -185,15 +180,10 @@ inplace() {
 
 inplace_rename() {
 	eval "$(ltraps)"
-	_inplace_cleanup() {
-		if [[ -e $out ]]; then
-			rm -f "$out"
-		fi
-	}
-	ltrap _inplace_cleanup
-	local in="${@: -1}"
-	local out="$(mktemp -p "$(dn "$in")" "${in##*/}.XXXXXXXXXX")"
-	set -- "${@:0:$#}"
+	local in="${*: -1}" out
+	out="$(mktemp -p "$(dn "$in")" "${in##*/}.XXXXXXXXXX")"
+	ltrap "rm -f ${out@Q}"
+	set -- "${@:1:$#-1}"
 
 	"$@" <"$in" >"$out"
 	mv "$out" "$in"
