@@ -49,31 +49,40 @@ mktemp1() {
 # Must be invoked after libmktemp_setup() which configures the cleanup handler.
 # See mktemp1() for behavior details.
 libmktemp() {
-	if ! [[ $_HAVE_CLEANUP_FILES ]]; then
+	if ! [[ $_CLEANUP_LIST ]]; then
 		die "libmktemp() called before libmktemp_setup()"
 	fi
 
-	_CLEANUP_FILES+="$(mktemp1 "$@")"
-	echo "${_CLEANUP_FILES[-1]}"
+	local tmpfile
+	tmpfile="$(mktemp1 "$@")" || return
+	printf "%s\n" "$tmpfile" >>"$_CLEANUP_LIST"
+	printf "%s\n" "$tmpfile"
 }
 
 libmktemp_cleanup() {
-	if ! [[ $_HAVE_CLEANUP_FILES ]]; then
+	if ! [[ $_CLEANUP_LIST ]]; then
 		die "libmktemp_cleanup() called before libmktemp_setup()"
 	fi
 
-	rm -f "${_CLEANUP_FILES[@]}"
-	_CLEANUP_FILES=()
+	local -a files
+	readarray -t files <"$_CLEANUP_LIST"
+	if (( ${#files[@]} )); then
+		rm -f "${files[@]}"
+	fi
+	: >"$_CLEANUP_LIST"
 }
 
 libmktemp_setup() {
-	if [[ $_HAVE_CLEANUP_FILES ]]; then
+	if [[ $_CLEANUP_LIST ]]; then
 		return
 	fi
 
-	declare -g _HAVE_CLEANUP_FILES=1
-	declare -g -a _CLEANUP_FILES
-	ltrap libmktemp_cleanup
+	# NOTE: the list of files to clean up is kept in a file rather than in
+	#       an array because libmktemp() is normally invoked in a command
+	#       substitution, and a subshell cannot register anything with us.
+	declare -g _CLEANUP_LIST
+	_CLEANUP_LIST="$(command mktemp --tmpdir "${LIB_NAME}.cleanup.XXXXXXXXXX")"
+	ltrap "libmktemp_cleanup; rm -f ${_CLEANUP_LIST@Q}"
 }
 
 libmktemp_use() {
