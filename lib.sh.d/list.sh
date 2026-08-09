@@ -11,9 +11,8 @@ _list_explode_a() {
 	declare -a in_array
 	out_array=()
 
-	IFS=,
+	local IFS=,
 	in_array=( $2 )
-	unset IFS
 
 	local i
 	for i in "${in_array[@]}"; do
@@ -63,9 +62,8 @@ _list_collapse_a() {
 	done
 	__list_collapse_one
 
-	IFS=,
+	local IFS=,
 	echo "${out_array[*]}"
-	unset IFS
 }
 
 _list_A_to_a() {
