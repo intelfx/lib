@@ -9,6 +9,7 @@
 _list_explode_a() {
 	declare -n out_array="$1"
 	declare -a in_array
+	out_array=()
 
 	IFS=,
 	in_array=( $2 )
