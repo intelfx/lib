@@ -8,12 +8,22 @@ function ssh_prep_parse_host() {
 		die "ssh: host not provided, exiting"
 	fi
 
-	if ! [[ "$host" =~ ^(([^@]+)@)?(.+)(:([0-9]+))?$ ]]; then
+	# This is unfortunately complicated.
+	#
+	# A plain greedy `.+` with an optional colon-delimited port will swallow the port,
+	# and a naive alternation between a colon-less hostname/IPv4 arm and an IPv6-like arm
+	# would swallow the port into the IPv6 arm (which is why IPv6 literals are bracketed in URIs),
+	# so we have to handle all three cases carefully.
+	#
+	# Match either a bracketed (IPv6) literal optionally followed by a colon and a port,
+	# colon-less literal (hostname or IPv4) also optionally followed by a colon and a port,
+	# or a bare IPv6-like literal not followed by anything. This is not a rigorous parser.
+	if ! [[ $host =~ ^(([^@]+)@)?((\[([^]]+)\]|[^:]+)(:([0-9]+))?|([0-9a-fA-F:]+))$ ]]; then
 		die "ssh: host '$host' is invalid, exiting"
 	fi
 	user="${BASH_REMATCH[2]}"
-	addr="${BASH_REMATCH[3]}"
-	port="${BASH_REPATCH[5]}"
+	addr="${BASH_REMATCH[5]:-${BASH_REMATCH[4]:-${BASH_REMATCH[8]}}}"
+	port="${BASH_REMATCH[7]}"
 
 	dbg "ssh: host '$host' parsed as user='$user' addr='$addr' port='$port'"
 }
