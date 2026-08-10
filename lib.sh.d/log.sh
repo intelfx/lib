@@ -1,5 +1,9 @@
 #!/hint/bash
 
+# set explicitly for shellcheck sake
+shopt -s lastpipe
+shopt -s extglob
+
 # log message prefixes by priority
 declare -A _LIBSH_PREFIX
 if [[ $JOURNAL_STREAM && ! -t 2 ]]; then

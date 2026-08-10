@@ -1,5 +1,9 @@
 #!/hint/bash
 
+# set explicitly for shellcheck sake
+shopt -s lastpipe
+shopt -s extglob
+
 regex_unwrap() {
 	local arg="$1"
 	local regex="$2"
