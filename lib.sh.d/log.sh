@@ -269,15 +269,20 @@ function Trace_resume() {
 	} &>/dev/null
 }
 
+# dry_run(): log the command being executed (as in trace()), unless --quiet is set,
+# and execute the command, unless $DRY_RUN is non-zero.
 function dry_run() {
-	{ local -; set +x; } &>/dev/null
+	# dry_run() is awkward. We need to suspend xtracing temporarily like
+	# any other logging function, but we also need to _resume_ xtracing
+	# before actually executing the command (_if_ we end up executing it).
+	{ local -; local _status="$-"; set +x; } &>/dev/null
 	if [[ $1 == "-q" || $1 == "--quiet" ]]; then
 		shift
 	else
 		_libsh_log "${_LIBSH_PRIO[trace]}" "->" "$LIBSH_LOG_PREFIX" "${*@Q}"
 	fi
 	if ! (( DRY_RUN )); then
-		{ if [[ ${_in_trace+set} ]]; then set -x; fi; } &>/dev/null
+		{ if [[ $_status == *x* ]]; then set -x; fi; } &>/dev/null
 		"$@"
 	fi
 }
