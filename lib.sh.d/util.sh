@@ -49,8 +49,8 @@ join() {
 }
 
 print_or() {
-    local text
-    text="$(cat)" && [[ "$text" ]] && printf "%s" "$text" || printf "%s" "$*"
+	local text
+	text="$(cat)" && [[ "$text" ]] && printf "%s" "$text" || printf "%s" "$*"
 }
 
 ifelse() {
