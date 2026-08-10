@@ -204,42 +204,58 @@ function trace() {
 	"$@"
 }
 
+# Trace(): log the commands being executed, recursively, using Bash's xtrace (set -x).
+# Reentrancy is supported. Trace_{suspend,resume}() temporarily disable and reenable xtrace.
 function Trace() {
 	{ local -; set +x; } &>/dev/null
-	if [[ ${_in_trace+set} ]]; then return; fi
-	local priority="${_LIBSH_PRIO[trace]}"
-	local prefix="${_LIBSH_PREFIX[$priority]}"
-	local rc=0
-	local PS4=""
-	if [[ $prefix ]]; then
-		PS4+="\\[$prefix\\]"
-	fi
-	PS4+="-> "
-	if [[ ! $LIBSH_TRACE_NO_PREFIX ]] && [[ $LIBSH_LOG_PREFIX ]]; then
-		PS4+="$LIBSH_LOG_PREFIX: "
+
+	# Create a new scope for the suspend counter even if recursively invoked
+	# (to match the new scope we create for xtrace)
+	local _in_trace_suspend=0
+
+	# All of this is skipped when recursively invoked
+	if ! [[ ${_in_trace+set} ]]; then
+		local _in_trace=1
+
+		local priority="${_LIBSH_PRIO[trace]}"
+		local prefix="${_LIBSH_PREFIX[$priority]}"
+		local ps4=""
+		if [[ $prefix ]]; then
+			ps4+="\\[$prefix\\]"
+		fi
+		ps4+="+  "
+		if ! [[ $LIBSH_TRACE_NO_PREFIX ]]; then
+			# expanded under `shopt -s promptvars` (default)
+			ps4+='${LIBSH_LOG_PREFIX:+"$LIBSH_LOG_PREFIX: "}'
+		fi
+		local PS4="$ps4"
 	fi
 
-	local _in_trace=1
-	local _in_trace_suspend=0
-	local _trace_old_set _trace_new_set
-	# `var=$(set +o)` creates a subshell and clears `set -e`, use read instead
-	# `read` returns nonzero on EOF, which will always happen due to `-d ''`
-	set +o | IFS= read -r -d '' _trace_old_set || true
-	trap '{ rc=$?; eval "$_trace_old_set"; } &>/dev/null; trap - ERR; return $rc' ERR
 	set -x
-	{ set +o | IFS= read -r -d '' _trace_new_set || true; } &>/dev/null
 	"$@"
-	{ rc=$?; eval "$_trace_old_set"; } &>/dev/null; trap - ERR; return $rc
 }
 function Trace_suspend() {
+	# we cannot use `local -; set +x` here because we need to modify
+	# shell options in the parent scope.
+	#
+	# if _you_ can, though, just use `{ local -; set +x; } &>/dev/null`
+	# instead of using Trace_{suspend,resume}().
+	{
+
 	if ! [[ ${_in_trace+set} ]]; then
 		return
 	fi
 	if ! (( _in_trace_suspend++ )); then
-		eval "$_trace_old_set"
+		set +x
 	fi
+
+	} &>/dev/null
 }
 function Trace_resume() {
+	# we cannot use `local -; set +x` here because we need to modify
+	# shell options in the parent scope
+	{
+
 	if ! [[ ${_in_trace+set} ]]; then
 		return
 	fi
@@ -247,8 +263,10 @@ function Trace_resume() {
 		return
 	fi
 	if ! (( --_in_trace_suspend )); then
-		eval "$_trace_new_set"
+		set -x
 	fi
+
+	} &>/dev/null
 }
 
 function dry_run() {
