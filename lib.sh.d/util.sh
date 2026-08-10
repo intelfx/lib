@@ -633,3 +633,13 @@ findctl_run() {
 
 	"${find_cmd[@]}"
 }
+
+bscalcq() {
+	local -a response
+	bscalc "$@" | readarray -t response ||:
+	case "${#response[@]}" in
+		1) echo "${response[0]%%+([a-zA-Z ])}" ;;
+		0) err "bscalc: no output"; return 1 ;;
+		*) errf "bscalc: %s\n" "${response[@]}"; return 1 ;;
+	esac
+}
