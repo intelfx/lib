@@ -131,6 +131,13 @@ function sayf() {
 	{ local -; set +x; } &>/dev/null
 	_libsh_logf "${_LIBSH_PRIO[say]}" "" "" "$@"
 }
+function logcat() {
+	{ local -; set +x; } &>/dev/null
+	local line
+	while IFS= read -r line; do
+		_libsh_log "${_LIBSH_PRIO[say]}" "" "" "$line"
+	done
+}
 
 function warn() {
 	{ local -; set +x; } &>/dev/null
