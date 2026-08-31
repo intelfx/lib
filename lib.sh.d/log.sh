@@ -62,7 +62,7 @@ function _libsh_printf_var() {
 	for (( c=0; c < ${#args[@]}; ++c )); do
 		case "${args_spec[$((c % cnt))]}" in
 		%v) args[c]="${!args[c]}"; ;;
-		%V) args[c]="$(declare -p "${args[c]}")"; args[c]="${args[c]#declare +(-+([^ ]) )}"; ;;
+		%V) args[c]="$(declare -p "${args[c]}" || echo "(${args[c]} unset)")"; args[c]="${args[c]#declare +(-+([^ ]) )}"; ;;
 		esac
 	done
 
