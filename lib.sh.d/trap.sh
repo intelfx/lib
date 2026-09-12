@@ -88,6 +88,7 @@ globaltraps() {
 }
 
 ltrap() {
+	{ local -; set +x; } &>/dev/null
 	# prepend
 	__traps=( "$1" "${__traps[@]}" )
 	# add the same trap to the "shadow" stack for EXIT (see above)
@@ -95,14 +96,17 @@ ltrap() {
 }
 
 luntrap() {
+	{ local -; set +x; } &>/dev/null
 	# remove first item
 	__traps=( "${__traps[@]:1}" )
 	__gtraps=( "${__gtraps[@]:1}" )
 }
 
 lruntrap() {
+	{
 	local __t="${__traps[0]}"
 	luntrap
+	} &>/dev/null
 	eval "$__t" || true
 }
 
