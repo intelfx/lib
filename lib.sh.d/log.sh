@@ -276,6 +276,14 @@ function Trace_resume() {
 	} &>/dev/null
 }
 
+# Same, but much simpler
+function _trace() {
+	local -
+	set -x
+	"$@"
+
+}
+
 # dry_run(): log the command being executed (as in trace()), unless --quiet is set,
 # and execute the command, unless $DRY_RUN is non-zero.
 function dry_run() {
@@ -405,6 +413,7 @@ libsh_export_log() {
 		XXX XXXf \
 		trace \
 		Trace \
+		_trace \
 		dry_run \
 
 		#check check_e \
