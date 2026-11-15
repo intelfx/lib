@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 # Usage: mkpipe <READ_FD> <WRITE_FD>
 # Returns: two newly opened fds in $<READ_FD> and $<WRITE_FD>
 mkpipe() {

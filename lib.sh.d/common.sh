@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 BASH_BUILTINS_LOADABLE=(
 	sleep
 )

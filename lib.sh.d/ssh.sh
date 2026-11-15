@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 # in: $host: [user@]host[:port]
 # out: $addr, $user, $port
 # error handling: die()

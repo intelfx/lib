@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 # Remember original $0 for error messages
 if ! [[ ${LIB_ARGV0+set} ]]; then
 	# Apparently, interpreted execution on Linux provides no way

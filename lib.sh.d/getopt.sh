@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 # XXX: shellcheck is too dumb to realize this is set from outside
 shopt -s lastpipe
 

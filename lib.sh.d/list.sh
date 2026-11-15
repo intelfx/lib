@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 #
 # A particularly ugly and inefficient implementation of basic logic operations
 # on lists of integer ranges (e. g. "1,2,4-5,7") as commonly found in various

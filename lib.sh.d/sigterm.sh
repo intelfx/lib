@@ -1,5 +1,7 @@
 #!/hint/bash
 
+# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+
 #
 # A companion to trap.sh (same disclaimer applies), this module can be used to
 # run long-living processes while remaining receptive to SIGTERM.
