@@ -1,6 +1,8 @@
 #!/hint/bash
 
 # shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+# shellcheck disable=SC2178  # buggy check, local array and scalar variables share names in different scopes
+# shellcheck disable=SC2128  # buggy check, knock-on from the above
 
 #
 # A particularly ugly and inefficient implementation of basic logic operations
@@ -14,7 +16,7 @@ _list_explode_a() {
 	out_array=()
 
 	local IFS=,
-	in_array=( $2 )
+	read -r -a in_array <<<"$2"
 
 	local i
 	for i in "${in_array[@]}"; do
@@ -37,7 +39,7 @@ _list_explode_a() {
 }
 
 __list_collapse_one() {
-	if [[ $first == $last ]]; then
+	if [[ $first == "$last" ]]; then
 		out_array+=( "$first" )
 	else
 		out_array+=( "$first-$last" )

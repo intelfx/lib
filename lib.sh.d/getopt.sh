@@ -1,6 +1,8 @@
 #!/hint/bash
 
 # shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+# shellcheck disable=SC2178  # buggy check, local array and scalar variables share names in different scopes
+# shellcheck disable=SC2128  # buggy check, knock-on from the above
 
 # $1: name of an associative array with argument definitions (see below)
 # $2...: arguments to parse
@@ -290,27 +292,27 @@ function get_arg() {
 	local f
 	# TODO: combined short options
 	for f in "${short[@]}"; do
-		if (( $# >= 2 )) && [[ $1 == $f ]]; then
+		if (( $# >= 2 )) && [[ $1 == "$f" ]]; then
 			key="$f"
 			value="$2"
 			shift_nr=2
 			return 0
-		elif (( $# >= 1 )) && [[ $1 == $f* ]]; then
+		elif (( $# >= 1 )) && [[ $1 == "$f"* ]]; then
 			key="$f"
-			value="${1#$f}"
+			value="${1#"$f"}"
 			shift_nr=1
 			return 0
 		fi
 	done
 	for f in "${long[@]}"; do
-		if (( $# >= 2 )) && [[ $1 == $f ]]; then
+		if (( $# >= 2 )) && [[ $1 == "$f" ]]; then
 			key="$f"
 			value="$2"
 			shift_nr=2
 			return 0
-		elif (( $# >= 1 )) && [[ $1 == $f=* ]]; then
+		elif (( $# >= 1 )) && [[ $1 == "$f"=* ]]; then
 			key="$f"
-			value="${1#$f=}"
+			value="${1#"$f="}"
 			shift_nr=1
 			return 0
 		fi
@@ -343,14 +345,14 @@ function get_flag() {
 	local f
 	# TODO: combined short options
 	for f in "${short[@]}"; do
-		if (( $# >= 1 )) && [[ $1 == $f ]]; then
+		if (( $# >= 1 )) && [[ $1 == "$f" ]]; then
 			key="$f"
 			shift_nr=1
 			return 0
 		fi
 	done
 	for f in "${long[@]}"; do
-		if (( $# >= 1 )) && [[ $1 == $f ]]; then
+		if (( $# >= 1 )) && [[ $1 == "$f" ]]; then
 			key="$f"
 			shift_nr=1
 			return 0

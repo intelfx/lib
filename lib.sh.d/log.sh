@@ -373,11 +373,12 @@ function loud() {
 		fi
 	done
 
-	local header="$(repeat '=' "$(( 5 + len + 5 ))")"
+	local header pad_l pad_r
+	header="$(repeat '=' "$(( 5 + len + 5 ))")"
 	_libsh_log "$prio" "" "" "$header"
 	for a in "${args[@]}"; do
-		local pad_l="$(repeat ' ' "$(( (len - ${#a}    ) / 2 ))")"  # rounded down
-		local pad_r="$(repeat ' ' "$(( (len - ${#a} + 1) / 2 ))")"  # rounded up
+		pad_l="$(repeat ' ' "$(( (len - ${#a}    ) / 2 ))")"  # rounded down
+		pad_r="$(repeat ' ' "$(( (len - ${#a} + 1) / 2 ))")"  # rounded up
 		_libsh_log "$prio" "" "" "==== ${pad_l}${a}${pad_r} ===="
 	done
 	_libsh_log "$prio" "" "" "$header"
@@ -389,8 +390,9 @@ function loudsep() {
 	{ local -; set +x; } &>/dev/null
 	declare -g _LIBSH_LAST_LOUD
 
-	local prio="${_LIBSH_PRIO[loud]}"
-	local header="$(repeat '=' "$_LIBSH_LAST_LOUD")"
+	local prio header
+	prio="${_LIBSH_PRIO[loud]}"
+	header="$(repeat '=' "$_LIBSH_LAST_LOUD")"
 	_libsh_log "$prio" "" "" "$header"
 }
 

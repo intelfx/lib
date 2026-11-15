@@ -1,6 +1,8 @@
 #!/hint/bash
 
 # shellcheck assume-sourced=SCRIPTDIR/../lib.sh
+# shellcheck disable=SC2178  # buggy check, local array and scalar variables share names in different scopes
+# shellcheck disable=SC2128  # buggy check, knock-on from the above
 
 regex_unwrap() {
 	local arg="$1"
@@ -327,8 +329,8 @@ readarray_append() {
 }
 
 var_copy() {
-	local src="$1" dest="$2"
-	local p="$(declare -p "$src")"
+	local src="$1" dest="$2" p
+	p="$(declare -p "$src")"
 	p="${p/ $src/ $dest}"
 	echo "$p"
 }
@@ -447,9 +449,9 @@ max() {
 }
 
 repeat() {
-	local in="$1" rep="$2"
+	local in="$1" rep="$2" out
 	if (( rep > 0 )); then
-		local out="$(printf "%*s" "$rep")"
+		out="$(printf "%*s" "$rep")"
 		if [[ "$in" != " " ]]; then
 			out="${out// /$in}"
 		fi
