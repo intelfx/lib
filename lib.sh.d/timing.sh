@@ -1,7 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
-
 timer_start() {
 	# $EPOCHREALTIME is locale-dependent
 	# but, apparently, setting $LC_ALL as a local is enough to influence it

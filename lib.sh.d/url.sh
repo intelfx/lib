@@ -1,7 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
-
 #
 # ref. https://unix.stackexchange.com/a/187256/21885
 #

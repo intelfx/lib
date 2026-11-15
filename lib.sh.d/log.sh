@@ -1,7 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
-
 # set explicitly for shellcheck sake
 shopt -s lastpipe
 shopt -s extglob

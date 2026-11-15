@@ -1,6 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
 # shellcheck disable=SC2178  # buggy check, local array and scalar variables share names in different scopes
 # shellcheck disable=SC2128  # buggy check, knock-on from the above
 

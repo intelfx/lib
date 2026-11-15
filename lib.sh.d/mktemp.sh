@@ -1,7 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
-
 # More ergonomic mktemp(1).
 # - implies `--tmpdir`
 # - any flags are passed to mktemp(1)

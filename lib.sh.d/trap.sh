@@ -1,7 +1,5 @@
 #!/hint/bash
 
-# shellcheck assume-sourced=SCRIPTDIR/../lib.sh
-
 #
 # Every time I get back to writing in bash, I end up writing a (new)
 # library that does awful things with traps.
