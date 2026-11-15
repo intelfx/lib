@@ -10,6 +10,7 @@ if ! [[ -d "$__libsh" ]]; then
 	return 1
 fi
 
+# shellcheck source=SCRIPTDIR/lib.sh.d/*.sh
 for __libsh_file in "$__libsh"/*.sh; do
 	if [[ -x "$__libsh_file" ]]; then
 		source "$__libsh_file" || exit
